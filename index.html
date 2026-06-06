@@ -2,1477 +2,463 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ポケスリ 週間エナジーシミュレーター</title>
-<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ポケモンスリープ アメ計算ツール</title>
 <style>
-:root{
-  --bg:#f0f4ff;--bg2:#e8eeff;--surface:#fff;--surface2:#f7f9ff;
-  --border:#d4dcf5;--shadow:0 2px 16px rgba(100,120,220,.10);
-  --blue:#4f7cff;--blue-light:#e8eeff;
-  --green:#3ecf8e;--green-light:#e6faf3;
-  --orange:#ff8c42;--orange-light:#fff3ea;
-  --pink:#ff6b9d;--pink-light:#ffecf3;
-  --yellow:#fbbf24;--purple:#a78bfa;--purple-light:#f3f0ff;
-  --colA:#4f7cff;--colA-light:#e8eeff;
-  --colB:#f59e0b;--colB-light:#fef3c7;
-  --text:#1e2a4a;--text-mid:#5a6a8a;--text-dim:#9aaac0;
-  --morning:#ff8c42;--noon:#3ecf8e;--night:#4f7cff;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'M PLUS Rounded 1c',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
-
-/* ヘッダー */
-.app-header{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--surface);border-bottom:1.5px solid var(--border);box-shadow:0 2px 12px rgba(100,120,220,.10);}
-.header-top{display:flex;align-items:center;padding:0 1rem;height:48px;gap:.8rem;}
-.logo{font-size:.95rem;font-weight:900;color:var(--blue);display:flex;align-items:center;gap:.4rem;white-space:nowrap;}
-.logo-badge{background:var(--blue);color:#fff;font-size:.55rem;padding:2px 5px;border-radius:20px;font-weight:700;}
-
-.io-btn{padding:.28rem .7rem;border-radius:20px;border:1.5px solid var(--border);background:var(--surface2);font-family:'M PLUS Rounded 1c',sans-serif;font-size:.72rem;font-weight:800;color:var(--text-mid);cursor:pointer;transition:all .15s;white-space:nowrap;}
-.io-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light);}
-
-/* A/B切替 */
-.ab-switcher{display:flex;gap:4px;margin-left:auto;}
-.ab-btn{padding:.3rem .9rem;border-radius:20px;border:2px solid var(--border);background:#fff;font-family:'M PLUS Rounded 1c',sans-serif;font-size:.78rem;font-weight:900;color:var(--text-dim);cursor:pointer;transition:all .15s;}
-.ab-btn.a.active{background:var(--colA);border-color:var(--colA);color:#fff;}
-.ab-btn.b.active{background:var(--colB);border-color:var(--colB);color:#fff;}
-.ab-label{font-size:.65rem;font-weight:800;padding:2px 7px;border-radius:20px;}
-.ab-label.a{background:var(--colA-light);color:var(--colA);}
-.ab-label.b{background:var(--colB-light);color:var(--colB);}
-
-.tab-nav{display:flex;overflow-x:auto;padding:0 1rem;border-top:1px solid var(--bg2);scrollbar-width:none;}
-.tab-nav::-webkit-scrollbar{display:none;}
-.tab-btn{display:flex;align-items:center;gap:.3rem;padding:.5rem .85rem;font-family:'M PLUS Rounded 1c',sans-serif;font-size:.76rem;font-weight:800;color:var(--text-dim);background:none;border:none;border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;}
-.tab-btn:hover{color:var(--text-mid);}
-.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
-.tab-badge{font-size:.55rem;padding:1px 5px;border-radius:10px;font-weight:900;}
-
-.main{margin-top:88px;padding:1.2rem;flex:1;}
-.page{display:none;}.page.active{display:block;}
-.page-title{font-size:1rem;font-weight:900;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
-.page-ab-note{font-size:.72rem;color:var(--text-dim);margin-bottom:1rem;display:flex;align-items:center;gap:.4rem;}
-
-.card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:1.1rem 1.3rem;box-shadow:var(--shadow);margin-bottom:1rem;}
-.card-title{font-size:.68rem;font-weight:800;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase;margin-bottom:.9rem;}
-.field-label{font-size:.68rem;font-weight:700;color:var(--text-mid);margin-bottom:.25rem;margin-top:.65rem;}
-.field-label:first-of-type{margin-top:0;}
-input[type=text],input[type=number],select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'M PLUS Rounded 1c',sans-serif;font-size:.8rem;padding:.42rem .65rem;outline:none;transition:border-color .15s;-webkit-appearance:none;}
-input:focus,select:focus{border-color:var(--blue);}
-input::placeholder{color:var(--text-dim);}
-.btn{padding:.45rem 1.1rem;border-radius:50px;border:none;font-family:'M PLUS Rounded 1c',sans-serif;font-size:.78rem;font-weight:800;cursor:pointer;transition:all .15s;}
-.btn-primary{background:var(--blue);color:#fff;}
-.btn-primary:hover{transform:translateY(-1px);}
-.btn-ghost{background:none;border:1.5px solid var(--border);color:var(--text-mid);}
-.btn-ghost:hover{border-color:var(--blue);color:var(--blue);}
-.btn-sm{padding:.28rem .7rem;font-size:.7rem;}
-.btn-danger{background:none;border:1.5px solid var(--border);color:var(--text-dim);}
-.btn-danger:hover{border-color:var(--pink);color:var(--pink);}
-
-/* ① ポケモン設定 */
-.pokemon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
-.pokemon-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:1.1rem;box-shadow:var(--shadow);}
-.pokemon-card:hover{border-color:var(--blue);}
-.pokemon-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;}
-.pokemon-num-badge{background:var(--blue-light);color:var(--blue);font-size:.62rem;font-weight:900;padding:2px 8px;border-radius:20px;}
-.ingredient-row{display:grid;grid-template-columns:1fr 68px;gap:.35rem;align-items:center;}
-.slot-label{font-size:.6rem;color:var(--text-dim);font-weight:700;margin-bottom:.08rem;}
-.add-pokemon-wrap{display:flex;justify-content:center;margin-top:.5rem;}
-
-.skill-section{margin-top:.7rem;padding:.75rem;background:var(--purple-light);border:1.5px solid #ddd6fe;border-radius:12px;}
-.skill-toggle-row{display:flex;align-items:center;gap:.5rem;cursor:pointer;user-select:none;}
-.skill-toggle-label{font-size:.76rem;font-weight:800;color:var(--purple);}
-.toggle-box{width:30px;height:17px;background:var(--border);border-radius:20px;position:relative;transition:background .15s;flex-shrink:0;}
-.toggle-box.on{background:var(--purple);}
-.toggle-box::after{content:'';position:absolute;width:13px;height:13px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
-.toggle-box.on::after{transform:translateX(13px);}
-.skill-detail{margin-top:.6rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
-
-/* ② シフト表 */
-.shift-wrapper{overflow-x:auto;}
-.shift-table{width:100%;border-collapse:separate;border-spacing:0;min-width:580px;}
-.shift-table th{background:var(--surface2);font-size:.65rem;font-weight:800;color:var(--text-mid);padding:.45rem .35rem;text-align:center;border-bottom:2px solid var(--border);}
-.shift-table th:first-child{text-align:left;padding-left:.7rem;min-width:85px;}
-.shift-table td{padding:.25rem .25rem;border-bottom:1px solid var(--bg2);vertical-align:middle;}
-.shift-label{display:inline-block;font-size:.68rem;font-weight:800;padding:3px 7px;border-radius:7px;white-space:nowrap;}
-.shift-label.morning{background:var(--orange-light);color:var(--morning);}
-.shift-label.noon{background:var(--green-light);color:var(--noon);}
-.shift-label.night{background:var(--blue-light);color:var(--night);}
-.shift-time-hint{font-size:.56rem;color:var(--text-dim);display:block;margin-top:2px;}
-.shift-slots{display:flex;gap:3px;padding:2px;flex-wrap:wrap;}
-.shift-slot{width:56px;height:28px;border:1.5px dashed var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.6rem;font-weight:700;color:var(--text-dim);transition:all .12s;background:var(--surface2);}
-.shift-slot.filled{border-style:solid;border-color:var(--blue);background:var(--blue-light);color:var(--blue);}
-.shift-slot.filled:hover{background:var(--pink-light);border-color:var(--pink);color:var(--pink);}
-.shift-slot:not(.filled):hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light);}
-/* げんきオール不在ブロック */
-.shift-slots.no-genki{background:rgba(255,107,157,.08);border-radius:6px;}
-.no-genki-badge{font-size:.55rem;font-weight:800;color:var(--pink);background:var(--pink-light);border-radius:4px;padding:1px 4px;margin-top:2px;display:inline-block;}
-
-.bulk-day-btn{display:block;margin:3px auto 0;padding:2px 5px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);font-family:'M PLUS Rounded 1c',sans-serif;font-size:.55rem;font-weight:700;color:var(--text-dim);cursor:pointer;white-space:nowrap;transition:all .12s;}
-.bulk-day-btn:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-light);}
-.bulk-slot-btn{padding:.3rem .7rem;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);font-family:'M PLUS Rounded 1c',sans-serif;font-size:.68rem;font-weight:800;color:var(--text-mid);cursor:pointer;transition:all .12s;white-space:nowrap;}
-.bulk-slot-btn:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-light);}
-
-/* モーダル */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;}
-.modal-overlay.hidden{display:none;}
-.modal-box{background:var(--surface);border-radius:20px;padding:1.3rem;width:min(400px,90vw);max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2);}
-.modal-title{font-size:.88rem;font-weight:900;margin-bottom:.9rem;}
-.modal-poke-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.45rem;}
-.modal-poke-btn{padding:.45rem .55rem;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);font-family:'M PLUS Rounded 1c',sans-serif;font-size:.72rem;font-weight:700;color:var(--text-mid);cursor:pointer;text-align:left;transition:all .12s;}
-.modal-poke-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light);}
-.modal-poke-btn.already{opacity:.35;cursor:not-allowed;}
-.modal-cancel{margin-top:.7rem;width:100%;padding:.45rem;border:1.5px solid var(--border);border-radius:10px;background:none;font-family:'M PLUS Rounded 1c',sans-serif;font-size:.75rem;font-weight:800;color:var(--text-mid);cursor:pointer;}
-.modal-cancel:hover{border-color:var(--pink);color:var(--pink);}
-
-/* ③ 食材備蓄 */
-.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:.65rem;}
-.stock-item{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:.7rem .9rem;}
-.stock-name{font-size:.73rem;font-weight:700;margin-bottom:.45rem;}
-.stock-ctrl{display:grid;grid-template-columns:26px 1fr 26px;gap:3px;align-items:center;}
-.stock-btn{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-mid);transition:all .12s;padding:0;line-height:1;}
-.stock-btn:hover{border-color:var(--blue);color:var(--blue);}
-.stock-val{text-align:center;font-size:.95rem;font-weight:900;border:1.5px solid var(--border);border-radius:7px;background:#fff;padding:.18rem;-webkit-appearance:none;}
-
-.genre-btn{padding:.38rem 1rem;border-radius:20px;border:2px solid var(--border);background:#fff;font-family:'M PLUS Rounded 1c',sans-serif;font-size:.76rem;font-weight:800;color:var(--text-mid);cursor:pointer;transition:all .15s;}
-.genre-btn:hover{border-color:var(--blue);color:var(--blue);}
-.genre-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;}
-
-/* ジャンル別グループ */
-.recipe-settings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;}
-.recipe-setting-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:1rem 1.1rem;box-shadow:var(--shadow);}
-.recipe-setting-name{font-size:.85rem;font-weight:900;margin-bottom:.7rem;}
-.ing-tag{display:inline-flex;align-items:center;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:.63rem;padding:2px 5px;margin:2px;}
-
-/* ④ 料理予定表 */
-.day-tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.9rem;}
-.day-tab{padding:.35rem .85rem;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:.72rem;font-weight:800;color:var(--text-mid);cursor:pointer;transition:all .12s;}
-.day-tab:hover{border-color:var(--blue);color:var(--blue);}
-.day-tab.active{background:var(--blue);border-color:var(--blue);color:#fff;}
-.day-tab.sunday.active{background:var(--pink);border-color:var(--pink);}
-.meal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;}
-@media(max-width:640px){.meal-grid{grid-template-columns:1fr;}}
-.meal-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:.9rem 1rem;box-shadow:var(--shadow);}
-.meal-header{display:flex;align-items:center;gap:.45rem;padding-bottom:.55rem;border-bottom:1.5px solid var(--bg2);margin-bottom:.65rem;}
-.meal-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.meal-dot.morning{background:var(--morning);}.meal-dot.noon{background:var(--noon);}.meal-dot.night{background:var(--night);}
-.meal-title{font-size:.78rem;font-weight:900;}
-.meal-time{font-size:.58rem;color:var(--text-dim);margin-left:auto;}
-.energy-box{margin-top:.6rem;background:var(--orange-light);border-radius:9px;padding:.5rem .7rem;}
-.energy-box-label{font-size:.6rem;color:var(--text-dim);font-weight:700;}
-.energy-box-val{font-size:1rem;font-weight:900;color:var(--orange);}
-.energy-box-sub{font-size:.6rem;color:var(--text-dim);margin-top:1px;}
-.prob-breakdown{margin-top:.55rem;background:var(--surface2);border-radius:8px;padding:.45rem .65rem;font-size:.66rem;color:var(--text-mid);}
-.prob-row{display:flex;justify-content:space-between;padding:1px 0;}
-.prob-row.total{font-weight:900;color:var(--purple);border-top:1px solid var(--border);margin-top:3px;padding-top:3px;}
-.prob-cap{font-size:.6rem;color:var(--pink);margin-top:2px;}
-
-/* 実行可否バッジ */
-.feasibility{font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block;margin-top:.4rem;}
-.feasibility.ok{background:var(--green-light);color:var(--green);}
-.feasibility.warn{background:#fff8e1;color:#d97706;}
-.feasibility.ng{background:var(--pink-light);color:var(--pink);}
-
-/* ⑤ 週間サマリー */
-.summary-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-bottom:1rem;}
-@media(max-width:500px){.summary-kpis{grid-template-columns:1fr 1fr;}}
-.kpi-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:.9rem 1rem;box-shadow:var(--shadow);text-align:center;}
-.kpi-label{font-size:.6rem;font-weight:800;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;}
-.kpi-val{font-size:1.75rem;font-weight:900;line-height:1.2;margin-top:.15rem;}
-.kpi-val.blue{color:var(--blue);}.kpi-val.green{color:var(--green);}.kpi-val.orange{color:var(--orange);}
-.kpi-sub{font-size:.62rem;color:var(--text-dim);margin-top:.1rem;}
-.result-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.78rem;}
-.result-table thead th{background:var(--surface2);padding:.5rem .75rem;font-size:.64rem;font-weight:800;color:var(--text-dim);letter-spacing:.08em;text-align:right;border-bottom:2px solid var(--border);}
-.result-table thead th:first-child{text-align:left;}
-.result-table tbody tr:hover{background:var(--bg2);}
-.result-table tbody td{padding:.55rem .75rem;border-bottom:1px solid var(--bg2);text-align:right;font-weight:700;}
-.result-table tbody td:first-child{text-align:left;color:var(--text-mid);font-weight:800;}
-.result-table tbody td.kinomi-val{color:var(--green);}
-.result-table tfoot td{padding:.55rem .75rem;font-weight:900;text-align:right;background:var(--blue-light);color:var(--blue);}
-.result-table tfoot td:first-child{text-align:left;}
-.recipe-total-box{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;margin-bottom:1rem;}
-.rtb-item{border-radius:12px;padding:.65rem .9rem;text-align:center;}
-.rtb-label{font-size:.6rem;font-weight:800;}
-.rtb-val{font-size:1.1rem;font-weight:900;}
-.day-bars{display:grid;grid-template-columns:repeat(7,1fr);gap:.4rem;align-items:end;height:100px;margin-top:.5rem;}
-.day-bar-col{display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;}
-.day-bar-val{font-size:.56rem;color:var(--text-dim);font-weight:700;}
-.day-bar-stack{width:100%;display:flex;flex-direction:column;gap:1px;}
-.day-bar-k{background:var(--green);border-radius:4px 4px 0 0;min-height:2px;}
-.day-bar-s{background:var(--orange);border-radius:0 0 4px 4px;min-height:2px;}
-.day-bar-label{font-size:.65rem;font-weight:800;color:var(--text-mid);}
-.legend{display:flex;gap:.9rem;flex-wrap:wrap;}
-.legend-item{display:flex;align-items:center;gap:4px;font-size:.66rem;color:var(--text-mid);font-weight:700;}
-.legend-dot{width:8px;height:8px;border-radius:2px;}
-
-/* 比較サマリー */
-.compare-summary{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
-.compare-panel{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:1rem 1.1rem;box-shadow:var(--shadow);}
-.compare-panel.a{border-color:var(--colA);}
-.compare-panel.b{border-color:var(--colB);}
-.compare-panel-title{font-size:.85rem;font-weight:900;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem;}
-.compare-kpi{margin-bottom:.5rem;}
-.compare-kpi-label{font-size:.6rem;color:var(--text-dim);font-weight:700;}
-.compare-kpi-val{font-size:1.3rem;font-weight:900;}
-.diff-badge{font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:20px;}
-.diff-badge.better{background:var(--green-light);color:var(--green);}
-.diff-badge.worse{background:var(--pink-light);color:var(--pink);}
-.diff-badge.same{background:var(--bg2);color:var(--text-dim);}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f0fdf9;color:#1a1a1a;padding:16px;max-width:720px;margin:0 auto}
+/* top bar */
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.page-title{font-size:18px;font-weight:700;color:#0F6E56;display:flex;align-items:center;gap:6px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-new{display:flex;align-items:center;gap:5px;height:36px;padding:0 16px;border-radius:20px;border:none;background:#1D9E75;color:#fff;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(29,158,117,.3);transition:background .15s}
+.btn-new:hover{background:#0F6E56}
+.btn-io{display:flex;align-items:center;gap:5px;height:36px;padding:0 14px;border-radius:20px;border:1.5px solid #6ee7b7;background:#fff;color:#0F6E56;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-io:hover{background:#f0fdf9}
+/* card */
+.pcard{border-radius:14px;border:1.5px solid #b2e8d5;background:#fff;overflow:hidden;margin-bottom:10px;transition:border-color .15s,box-shadow .15s}
+.pcard.checked{border-color:#1D9E75;box-shadow:0 0 0 2px rgba(29,158,117,.18)}
+.pcard-header{display:flex;align-items:center;gap:10px;padding:11px 14px}
+.pcard-header-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;cursor:pointer}
+.pcard-header-left:hover .pcard-avatar{background:#d1fae5}
+.pcard-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:#e1f5ee;transition:background .15s}
+.pcard-name{font-size:14px;font-weight:600;color:#1a1a1a}
+.pcard-meta{font-size:11px;color:#6b7280;margin-top:1px}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px}
+.badge-candy{background:#dcfce7;color:#15803d}
+.badge-yume{background:#ede9fe;color:#5b21b6}
+.badge-nc{background:#f3f4f6;color:#9ca3af}
+.chevron{font-size:14px;color:#9ca3af;transition:transform .2s;flex-shrink:0;cursor:pointer;padding:4px}
+.chevron.open{transform:rotate(180deg)}
+/* checkbox */
+.chk-wrap{display:flex;align-items:center;flex-shrink:0}
+.chk-wrap input[type=checkbox]{width:18px;height:18px;accent-color:#1D9E75;cursor:pointer}
+/* body */
+.pcard-body{border-top:1px solid #d1fae5;padding:16px 14px;display:none;background:linear-gradient(to bottom,#f0fdf9,#fff)}
+.pcard-body.open{display:block}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:12px}
+.form-field{display:flex;flex-direction:column;gap:4px}
+.form-label{font-size:12px;color:#6b7280;font-weight:500}
+select,input[type=number],input[type=text]{height:34px;padding:0 10px;border-radius:8px;border:1px solid #bbf7d0;background:#fff;color:#1a1a1a;font-size:13px;width:100%;outline:none}
+select:focus,input:focus{border-color:#1D9E75;box-shadow:0 0 0 2px rgba(29,158,117,.15)}
+/* segment */
+.seg-section-title{font-size:12px;font-weight:600;color:#0F6E56;margin:10px 0 6px}
+.seg-row{display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #d1fae5;flex-wrap:wrap}
+.seg-row:last-child{border-bottom:none}
+.btn-del-seg{width:26px;height:26px;border-radius:50%;border:1px solid #fca5a5;background:transparent;color:#ef4444;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-del-seg:hover{background:#fee2e2}
+.btn-add-seg{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 12px;border-radius:8px;border:1px dashed #6ee7b7;background:#f0fdf9;color:#0F6E56;font-size:12px;cursor:pointer;margin-top:6px;font-weight:500}
+.btn-add-seg:hover{background:#d1fae5}
+/* card actions */
+.pcard-actions{display:flex;gap:8px;margin-top:14px}
+.btn-calc{flex:1;height:36px;border-radius:10px;border:none;background:#1D9E75;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.btn-calc:hover{background:#0F6E56}
+.btn-del-poke{height:36px;padding:0 14px;border-radius:10px;border:1px solid #fca5a5;background:transparent;color:#ef4444;font-size:12px;cursor:pointer;font-weight:500}
+.btn-del-poke:hover{background:#fee2e2}
+/* result */
+.result-box{margin-top:12px;padding:12px;background:#f0fdf9;border-radius:10px;border:1px solid #6ee7b7}
+.result-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:#4b5563;flex-wrap:wrap;gap:4px}
+.result-row b{color:#0F6E56}
+.result-big{display:flex;gap:10px;margin-bottom:8px}
+.result-metric{flex:1;background:#fff;border-radius:8px;padding:10px 12px;border:1px solid #bbf7d0}
+.result-metric-label{font-size:11px;color:#6b7280;margin-bottom:2px}
+.result-metric-val{font-size:20px;font-weight:700}
+.rm-candy{color:#15803d}
+.rm-yume{color:#5b21b6}
+/* total */
+.total-card{border-radius:14px;background:linear-gradient(135deg,#dcfce7,#ede9fe);border:2px solid #6ee7b7;padding:16px 18px;margin-top:4px}
+.total-title{font-size:14px;color:#0F6E56;font-weight:700;margin-bottom:10px}
+.total-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.total-metric{background:rgba(255,255,255,.75);border-radius:10px;padding:10px 14px}
+.total-metric-label{font-size:11px;color:#4b5563;margin-bottom:2px}
+.total-metric-val{font-size:22px;font-weight:700}
+.tv-candy{color:#15803d}
+.tv-yume{color:#5b21b6}
+.total-rows{font-size:12px;color:#4b5563}
+.total-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.06);gap:8px;flex-wrap:wrap}
+.total-row:last-child{border-bottom:none}
+.total-notice{font-size:12px;color:#6b7280;margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,.08)}
+/* emoji */
+.emoji-picker{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.emoji-btn{width:32px;height:32px;border-radius:50%;border:2px solid transparent;background:#f0fdf9;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.emoji-btn.sel{border-color:#1D9E75;background:#d1fae5}
+/* empty */
+.empty-state{text-align:center;padding:48px 20px;color:#6b7280;font-size:13px;background:#fff;border-radius:14px;border:1.5px dashed #6ee7b7}
+.empty-icon{font-size:44px;margin-bottom:10px}
+/* radio */
+.radio-group{display:flex;gap:10px;flex-wrap:wrap}
+.radio-group label{font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;color:#374151}
+/* boost badges */
+.badge-boost{background:#dcfce7;color:#15803d;font-size:10px;padding:2px 7px;border-radius:999px}
+.badge-none-sm{background:#f3f4f6;color:#6b7280;font-size:10px;padding:2px 7px;border-radius:999px}
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:480px;padding:20px;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.modal-title{font-size:15px;font-weight:700;color:#0F6E56;margin-bottom:12px}
+.modal-body{font-size:13px;color:#374151;margin-bottom:16px;line-height:1.6}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal textarea{width:100%;height:140px;font-size:12px;font-family:monospace;border:1px solid #bbf7d0;border-radius:8px;padding:10px;resize:vertical;outline:none}
+.modal textarea:focus{border-color:#1D9E75}
+.btn-modal-ok{height:34px;padding:0 18px;border-radius:8px;border:none;background:#1D9E75;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.btn-modal-ok:hover{background:#0F6E56}
+.btn-modal-cancel{height:34px;padding:0 14px;border-radius:8px;border:1px solid #d1d5db;background:#fff;color:#374151;font-size:13px;cursor:pointer}
+.btn-modal-cancel:hover{background:#f9fafb}
 </style>
 </head>
 <body>
 
-<header class="app-header">
-  <div class="header-top">
-    <div class="logo">🌙 ポケスリ週間エナジー <span class="logo-badge">SIM</span></div>
-    <!-- 保存/読込 -->
-    <div style="display:flex;gap:.4rem;margin-left:auto;align-items:center;">
-      <button class="io-btn" onclick="exportData()" title="データを保存">💾 保存</button>
-      <label class="io-btn" title="データを読込">
-        📂 読込<input type="file" accept=".json" onchange="importData(event)" style="display:none;">
-      </label>
-      <div class="ab-switcher" style="margin-left:.3rem;">
-        <button class="ab-btn a active" id="btnA" onclick="switchAB('A')">P1</button>
-        <button class="ab-btn b"        id="btnB" onclick="switchAB('B')">P2</button>
-      </div>
-    </div>
+<div class="top-bar">
+  <div class="page-title">🌙 アメ・ゆめのかけら 計算</div>
+  <div class="top-actions">
+    <button class="btn-io" onclick="exportData()">📤 エクスポート</button>
+    <button class="btn-io" onclick="openImport()">📥 インポート</button>
+    <button class="btn-new" onclick="addPokemon()">＋ 追加</button>
   </div>
-  <nav class="tab-nav">
-    <button class="tab-btn active" onclick="showPage('pokemon',this)">🐾 ポケモン</button>
-    <button class="tab-btn" onclick="showPage('stock',this)">🧺 食材備蓄</button>
-    <button class="tab-btn" onclick="showPage('recipe-setting',this)">🍽️ 料理設定</button>
-    <button class="tab-btn" onclick="showPage('shift',this)">📅 シフト表</button>
-    <button class="tab-btn" onclick="showPage('meal-plan',this)">🍳 料理予定表</button>
-    <button class="tab-btn" onclick="showPage('summary',this)">✨ サマリー</button>
-    <button class="tab-btn" onclick="showPage('compare',this)">📊 P1/P2比較</button>
-  </nav>
-</header>
+</div>
 
-<main class="main">
+<div id="poke-list"></div>
+<div id="total-area" style="margin-top:4px"></div>
 
-  <!-- ① ポケモン設定（共通） -->
-  <div class="page active" id="page-pokemon">
-    <div class="page-title">🐾 ① ポケモン個体値設定 <span style="font-size:.7rem;color:var(--text-dim);font-weight:400;">共通設定</span></div>
-    <div class="pokemon-grid" id="pokemonGrid"></div>
-    <div class="add-pokemon-wrap" style="margin-top:.5rem;">
-      <button class="btn btn-ghost" onclick="addPokemon()" id="addPokemonBtn">＋ ポケモンを追加</button>
+<!-- Import modal -->
+<div class="modal-overlay" id="import-modal" style="display:none" onclick="closeImportOnOverlay(event)">
+  <div class="modal">
+    <div class="modal-title">📥 インポート</div>
+    <div class="modal-body">エクスポートで保存したJSONテキストを貼り付けてください。<br><span style="color:#ef4444;font-weight:600">※ 現在のデータは上書きされます。</span></div>
+    <textarea id="import-text" placeholder='{"version":1,"pokemons":[...]}'></textarea>
+    <div class="modal-actions" style="margin-top:12px">
+      <button class="btn-modal-cancel" onclick="closeImport()">キャンセル</button>
+      <button class="btn-modal-ok" onclick="doImport()">インポートする</button>
     </div>
-  </div>
-
-  <!-- ② シフト表（A/B独立） -->
-  <div class="page" id="page-shift">
-    <div class="page-title">📅 ② シフト表</div>
-    <div class="page-ab-note" id="shiftAbNote"></div>
-    <div class="card">
-      <div class="card-title" style="margin-bottom:.5rem;">各ブロックで5枠のスロットをタップしてポケモンを選択</div>
-      <div style="margin-bottom:.7rem;" class="legend">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--morning)"></div>朝 4:00〜11:59（8h）</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--noon)"></div>昼 12:00〜17:59（6h）</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--night)"></div>夜 18:00〜翌3:59（10h）</div>
-      </div>
-      <div class="shift-wrapper"><table class="shift-table" id="shiftTable"></table></div>
-      <!-- 枠ごと一括変更 -->
-      <div id="slotBulkArea" style="margin-top:.6rem;border-top:1px solid var(--bg2);padding-top:.6rem;"></div>
-    </div>
-  </div>
-
-  <!-- ③ 食材備蓄（共通） -->
-  <div class="page" id="page-stock">
-    <div class="page-title">🧺 ③ 食材備蓄（月曜日開始時点） <span style="font-size:.7rem;color:var(--text-dim);font-weight:400;">共通設定</span></div>
-    <div class="card">
-      <div class="card-title">前週から持ち越した食材数</div>
-      <div class="stock-grid" id="stockGrid"></div>
-    </div>
-  </div>
-
-  <!-- 料理設定（共通） -->
-  <div class="page" id="page-recipe-setting">
-    <div class="page-title">🍽️ 料理設定 <span style="font-size:.7rem;color:var(--text-dim);font-weight:400;">共通設定</span></div>
-    <div class="card" style="margin-bottom:1rem;">
-      <div class="card-title">🌍 フィールドボーナス（FB）設定</div>
-      <div style="max-width:200px;">
-        <div class="field-label">FB % （料理エナジーに加算）</div>
-        <input type="number" id="fbInput" value="0" min="0" max="200" placeholder="例: 50"
-          onchange="globalFB=+this.value; renderRecipeSettings()">
-        <div style="margin-top:.4rem;font-size:.68rem;color:var(--text-dim);">
-          例：FB50%、料理エナジー1000 → 1500エナジー
-        </div>
-      </div>
-    </div>
-    <!-- ジャンルタブ -->
-    <div style="display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap;">
-      <div class="day-tab active" id="rtab-curry"   onclick="selectRecipeGenreTab('curry')">🍛 カレー・シチュー</div>
-      <div class="day-tab"        id="rtab-salad"   onclick="selectRecipeGenreTab('salad')">🥗 サラダ</div>
-      <div class="day-tab"        id="rtab-dessert" onclick="selectRecipeGenreTab('dessert')">🧇 デザート・ドリンク</div>
-    </div>
-    <div id="recipeSettingGrid"></div>
-  </div>
-
-  <!-- ④ 料理予定表（A/B独立） -->
-  <div class="page" id="page-meal-plan">
-    <div class="page-title">🍳 ④ 料理予定表</div>
-    <div class="page-ab-note" id="mealAbNote"></div>
-    <!-- ジャンル選択 -->
-    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap;">
-      <span style="font-size:.75rem;font-weight:800;color:var(--text-mid);">料理ジャンル：</span>
-      <button class="genre-btn active" data-genre="curry"   onclick="selectGenre('curry',this)">🍛 カレー・シチュー</button>
-      <button class="genre-btn"        data-genre="salad"   onclick="selectGenre('salad',this)">🥗 サラダ</button>
-      <button class="genre-btn"        data-genre="dessert" onclick="selectGenre('dessert',this)">🧇 デザート・ドリンク</button>
-    </div>
-    <div class="day-tabs" id="mealDayTabs"></div>
-    <div class="meal-grid" id="mealGrid"></div>
-  </div>
-
-  <!-- ⑤ 週間サマリー（A/B独立） -->
-  <div class="page" id="page-summary">
-    <div class="page-title">✨ ⑤ 週間エナジーサマリー</div>
-    <div class="page-ab-note" id="summaryAbNote"></div>
-    <div class="summary-kpis" id="summaryKpis"></div>
-    <div class="card">
-      <div class="card-title">🐾 ポケモン別 きのみエナジー（週間）</div>
-      <table class="result-table" id="resultTable"></table>
-    </div>
-    <div class="card">
-      <div class="card-title">🍳 料理エナジー（週間・FB込み期待値）</div>
-      <div class="recipe-total-box" id="recipeTotalBox"></div>
-    </div>
-    <div class="card">
-      <div class="card-title" style="margin-bottom:.5rem;">📅 日別エナジー（きのみ＋料理）</div>
-      <div class="legend" style="margin-bottom:.7rem;">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>きのみ</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>料理（期待値）</div>
-      </div>
-      <div class="day-bars" id="dayBars"></div>
-    </div>
-  </div>
-
-  <!-- ⑥ A/B比較 -->
-  <div class="page" id="page-compare">
-    <div class="page-title">📊 A/B パターン比較</div>
-    <div id="compareContent"></div>
-  </div>
-
-</main>
-
-<!-- モーダル -->
-<div class="modal-overlay hidden" id="modalOverlay">
-  <div class="modal-box">
-    <div class="modal-title" id="modalTitle">ポケモンを選択</div>
-    <div class="modal-poke-list" id="modalPokeList"></div>
-    <button class="modal-cancel" onclick="closeModal()">キャンセル</button>
   </div>
 </div>
 
 <script>
-// ===== マスターデータ =====
-const INGREDIENTS = [
-  {id:'apple',   name:'とくせんリンゴ',    icon:'🍎'},
-  {id:'milk',    name:'モーモーミルク',     icon:'🍼'},
-  {id:'soy',     name:'ワカクサ大豆',      icon:'🫘'},
-  {id:'honey',   name:'あまいミツ',        icon:'🍯'},
-  {id:'meat',    name:'マメミート',        icon:'🍖'},
-  {id:'ginger',  name:'あったかジンジャー', icon:'🫚'},
-  {id:'tomato',  name:'あんみんトマト',    icon:'🍅'},
-  {id:'egg',     name:'とくせんエッグ',    icon:'🥚'},
-  {id:'oil',     name:'ピュアなオイル',    icon:'🪔'},
-  {id:'potato',  name:'ほっこりポテト',    icon:'🥔'},
-  {id:'herb',    name:'げきからハーブ',    icon:'🌶️'},
-  {id:'corn',    name:'ワカクサコーン',    icon:'🌽'},
-  {id:'cacao',   name:'リラックスカカオ',  icon:'🍫'},
-  {id:'coffee',  name:'めざましコーヒー',  icon:'☕'},
-  {id:'avocado', name:'つやつやアボカド',  icon:'🥑'},
-  {id:'mushroom',name:'あじわいキノコ',    icon:'🍄'},
-  {id:'leek',    name:'ふといながねぎ',    icon:'🧅'},
-  {id:'pumpkin', name:'ずっしりカボチャ',  icon:'🎃'},
-  {id:'tail',    name:'おいしいシッポ',    icon:'🍤'},
-];
-const ING_NONE = {id:'none', name:'—（なし）', icon:''};
+const EXP_TABLE={2:54,3:71,4:108,5:128,6:164,7:202,8:244,9:274,10:315,11:345,12:376,13:407,14:419,15:429,16:440,17:454,18:469,19:483,20:497,21:515,22:537,23:558,24:579,25:600,26:622,27:643,28:665,29:686,30:708,31:729,32:748,33:766,34:785,35:803,36:821,37:839,38:857,39:875,40:893,41:910,42:928,43:945,44:963,45:980,46:997,47:1015,48:1032,49:1049,50:1066,51:1362,52:1562,53:1747,54:1946,55:2195,56:2279,57:2404,58:2533,59:2666,60:2806,61:2850,62:2922,63:2977,64:3029,65:3077};
+const YUME_TABLE={2:14,3:18,4:22,5:27,6:30,7:34,8:39,9:44,10:48,11:50,12:52,13:53,14:56,15:59,16:62,17:66,18:68,19:71,20:74,21:78,22:81,23:85,24:88,25:92,26:95,27:100,28:105,29:111,30:117,31:122,32:126,33:130,34:136,35:143,36:151,37:160,38:167,39:174,40:184,41:192,42:201,43:211,44:221,45:227,46:236,47:250,48:264,49:279,50:295,51:309,52:323,53:338,54:356,55:372,56:391,57:437,58:486,59:538,60:593,61:651,62:698,63:750,64:804,65:866};
+const EMOJIS=['🐢','🦊','🐧','🐸','🐼','🦆','🐻','🐨','🦁','🐯','🐰','🐹','🐭','🐱','🐶','🐮','🐷','🦋','🦄','⭐'];
 
-const RECIPES = [
-  // ===== カレー・シチュー =====
-  {id:'avocado_gratin',   genre:'curry', name:'しんりょくアボカドグラタン', icon:'🫕', baseEnergy:24802,
-   ingredients:{milk:41,potato:20,oil:32,avocado:22}},
-  {id:'sukiyaki_curry',   genre:'curry', name:'いあいぎりすき焼きカレー',   icon:'🍛', baseEnergy:20655,
-   ingredients:{meat:26,leek:27,egg:22,honey:26}},
-  {id:'power_stew',       genre:'curry', name:'めざめるパワーシチュー',     icon:'🫕', baseEnergy:19061,
-   ingredients:{soy:28,tomato:25,mushroom:23,coffee:16}},
-  {id:'pumpkin_stew',     genre:'curry', name:'なりきりバケッチャシチュー', icon:'🫕', baseEnergy:15621,
-   ingredients:{meat:16,potato:18,mushroom:25,pumpkin:10}},
-  {id:'corn_keema',       genre:'curry', name:'れんごくコーンキーマカレー', icon:'🍛', baseEnergy:13690,
-   ingredients:{meat:24,herb:27,ginger:12,corn:14}},
-  {id:'ninja_curry',      genre:'curry', name:'ニンジャカレー',             icon:'🍛', baseEnergy:9445,
-   ingredients:{soy:24,meat:9,leek:12,mushroom:5}},
-  {id:'butter_curry',     genre:'curry', name:'ぜったいねむりバターカレー', icon:'🍛', baseEnergy:9010,
-   ingredients:{cacao:12,milk:10,potato:18,tomato:15}},
-  {id:'tail_curry',       genre:'curry', name:'あぶりテールカレー',         icon:'🍛', baseEnergy:7483,
-   ingredients:{herb:25,tail:8}},
-  {id:'negi_curry',       genre:'curry', name:'からくちネギもりカレー',     icon:'🍛', baseEnergy:5900,
-   ingredients:{leek:14,herb:8,ginger:10}},
-  {id:'piyopiyo_curry',   genre:'curry', name:'ピヨピヨパンチ辛口カレー',  icon:'🍛', baseEnergy:5702,
-   ingredients:{herb:11,honey:11,coffee:11}},
-  {id:'corn_stew',        genre:'curry', name:'じゅうなんコーンシチュー',   icon:'🫕', baseEnergy:4670,
-   ingredients:{milk:8,potato:8,corn:14}},
-  {id:'oyakoai_curry',    genre:'curry', name:'おやこあいカレー',           icon:'🍛', baseEnergy:4523,
-   ingredients:{potato:4,apple:11,egg:8,honey:12}},
-  {id:'kinoko_curry',     genre:'curry', name:'キノコのほうしカレー',       icon:'🍛', baseEnergy:4162,
-   ingredients:{potato:9,mushroom:14}},
-  {id:'buildup_curry',    genre:'curry', name:'ビルドアップマメカレー',     icon:'🍛', baseEnergy:3372,
-   ingredients:{soy:12,meat:6,egg:4,herb:4}},
-  {id:'white_stew',       genre:'curry', name:'ほっこりホワイトシチュー',   icon:'🫕', baseEnergy:3181,
-   ingredients:{milk:10,potato:8,mushroom:4}},
-  {id:'omu_curry',        genre:'curry', name:'とけるオムカレー',           icon:'🍛', baseEnergy:2150,
-   ingredients:{egg:10,tomato:6}},
-  {id:'tomato_curry',     genre:'curry', name:'サンパワートマトカレー',     icon:'🍛', baseEnergy:2078,
-   ingredients:{herb:5,tomato:10}},
-  {id:'katsu_curry',      genre:'curry', name:'ひでりカツレツカレー',       icon:'🍛', baseEnergy:1942,
-   ingredients:{meat:10,oil:5}},
-  {id:'cheese_curry',     genre:'curry', name:'満腹チーズバーグカレー',     icon:'🍛', baseEnergy:1910,
-   ingredients:{milk:8,meat:8}},
-  {id:'mame_curry',       genre:'curry', name:'マメバーグカレー',           icon:'🍛', baseEnergy:856,
-   ingredients:{meat:7}},
-  {id:'honey_curry',      genre:'curry', name:'ベイビィハニーカレー',       icon:'🍛', baseEnergy:839,
-   ingredients:{honey:7}},
-  {id:'simple_stew',      genre:'curry', name:'たんじゅんホワイトシチュー', icon:'🫕', baseEnergy:814,
-   ingredients:{milk:7}},
-  {id:'apple_curry',      genre:'curry', name:'とくせんリンゴカレー',       icon:'🍛', baseEnergy:748,
-   ingredients:{apple:7}},
+function candyExp(lv){return lv<=25?35:lv<=30?30:25;}
 
-  // ===== サラダ =====
-  {id:'nettou_salad',     genre:'salad', name:'ごろごろねっとうサラダ',     icon:'🥗', baseEnergy:25356,
-   ingredients:{potato:30,mushroom:27,corn:18,pumpkin:20}},
-  {id:'guacamole',        genre:'salad', name:'じならしワカモレチップス',   icon:'🥗', baseEnergy:25162,
-   ingredients:{soy:22,herb:30,corn:25,avocado:28}},
-  {id:'coffee_salad',     genre:'salad', name:'まけんきコーヒーサラダ',     icon:'🥗', baseEnergy:20218,
-   ingredients:{meat:28,potato:22,oil:22,coffee:28}},
-  {id:'yogurt_salad',     genre:'salad', name:'りんごさんヨーグルトサラダ', icon:'🥗', baseEnergy:19293,
-   ingredients:{milk:18,apple:28,egg:35,tomato:23}},
-  {id:'mimosa_salad',     genre:'salad', name:'はなふぶきミモザサラダ',     icon:'🥗', baseEnergy:11811,
-   ingredients:{meat:12,potato:15,oil:17,egg:25}},
-  {id:'ninja_salad',      genre:'salad', name:'ニンジャサラダ',             icon:'🥗', baseEnergy:11659,
-   ingredients:{soy:19,leek:15,ginger:11,mushroom:12}},
-  {id:'wakakusa_salad',   genre:'salad', name:'ワカクササラダ',             icon:'🥗', baseEnergy:11393,
-   ingredients:{potato:9,oil:22,tomato:14,corn:17}},
-  {id:'chopped_salad',    genre:'salad', name:'クロスチョップドサラダ',     icon:'🥗', baseEnergy:8755,
-   ingredients:{meat:15,egg:20,tomato:10,corn:11}},
-  {id:'pepper_salad',     genre:'salad', name:'ヤドンテールのペッパーサラダ',icon:'🥗',baseEnergy:8169,
-   ingredients:{oil:15,herb:10,tail:10}},
-  {id:'sweet_salad',      genre:'salad', name:'めいそうスイートサラダ',     icon:'🥗', baseEnergy:7675,
-   ingredients:{apple:21,honey:16,corn:12}},
-  {id:'avocado_salad',    genre:'salad', name:'くだけるアボカドサラダ',     icon:'🥗', baseEnergy:7125,
-   ingredients:{soy:18,oil:10,avocado:14}},
-  {id:'kinoko_salad',     genre:'salad', name:'キノコのほうしサラダ',       icon:'🥗', baseEnergy:5859,
-   ingredients:{oil:8,tomato:8,mushroom:17}},
-  {id:'overheat_salad',   genre:'salad', name:'オーバーヒートサラダ',       icon:'🥗', baseEnergy:5225,
-   ingredients:{herb:17,tomato:8,ginger:10}},
-  {id:'potato_salad',     genre:'salad', name:'くいしんぼうポテトサラダ',   icon:'🥗', baseEnergy:5040,
-   ingredients:{meat:7,potato:14,apple:6,egg:9}},
-  {id:'choco_meat_salad', genre:'salad', name:'ムラっけチョコミートサラダ', icon:'🥗', baseEnergy:3665,
-   ingredients:{cacao:14,meat:9}},
-  {id:'tofu_salad',       genre:'salad', name:'うるおいとうふサラダ',       icon:'🥗', baseEnergy:3113,
-   ingredients:{soy:15,tomato:9}},
-  {id:'wild_salad',       genre:'salad', name:'ばかぢからワイルドサラダ',   icon:'🥗', baseEnergy:2468,
-   ingredients:{meat:9,potato:3,egg:5}},
+let pokemons=[];
+let nextId=1;
 
-  // ===== デザート・ドリンク =====
-  {id:'choco_waffle',     genre:'dessert', name:'みつあつめチョコワッフル', icon:'🧇', baseEnergy:25484,
-   ingredients:{cacao:21,oil:28,honey:38,corn:28}},
-  {id:'pumpkin_pancake',  genre:'dessert', name:'ドキドキこわいかおパンケーキ',icon:'🥞',baseEnergy:24354,
-   ingredients:{egg:24,tomato:29,honey:32,pumpkin:18}},
-  {id:'eclair',           genre:'dessert', name:'ドオーのエクレア',         icon:'🍮', baseEnergy:20885,
-   ingredients:{cacao:30,milk:26,honey:22,coffee:24}},
-  {id:'spice_cola',       genre:'dessert', name:'スパークスパイスコーラ',   icon:'🥤', baseEnergy:17494,
-   ingredients:{leek:20,apple:35,ginger:20,coffee:12}},
-  {id:'macaron',          genre:'dessert', name:'フラワーギフトマカロン',   icon:'🍬', baseEnergy:13834,
-   ingredients:{cacao:25,milk:10,egg:25,honey:17}},
-  {id:'corn_scone',       genre:'dessert', name:'おちゃかいコーンスコーン', icon:'🧁', baseEnergy:10925,
-   ingredients:{milk:9,apple:20,ginger:20,corn:18}},
-  {id:'smoothie',         genre:'dessert', name:'グラスミキサースムージー', icon:'🥤', baseEnergy:8165,
-   ingredients:{milk:14,tomato:16,avocado:18}},
-  {id:'pudding',          genre:'dessert', name:'プリンのプリンアラモード', icon:'🍮', baseEnergy:7594,
-   ingredients:{milk:10,apple:10,egg:15,honey:20}},
-  {id:'tiramisu',         genre:'dessert', name:'かたやぶりコーンティラミス',icon:'🍰',baseEnergy:7125,
-   ingredients:{milk:12,corn:14,coffee:14}},
-  {id:'coffee_jelly',     genre:'dessert', name:'はやおきコーヒーゼリー',   icon:'🍮', baseEnergy:6793,
-   ingredients:{milk:14,honey:12,coffee:16}},
-  {id:'popcorn',          genre:'dessert', name:'だいばくはつポップコーン', icon:'🍿', baseEnergy:6048,
-   ingredients:{milk:7,oil:14,corn:15}},
-  {id:'soy_donut',        genre:'dessert', name:'ちからもちソイドーナッツ', icon:'🍩', baseEnergy:5547,
-   ingredients:{soy:16,cacao:7,oil:12}},
-  {id:'detox_tea',        genre:'dessert', name:'ネロリのデトックスティー', icon:'🍵', baseEnergy:5065,
-   ingredients:{apple:15,ginger:11,mushroom:9}},
-  {id:'ginger_cookie',    genre:'dessert', name:'ふくつのジンジャークッキー',icon:'🍪',baseEnergy:4921,
-   ingredients:{cacao:5,egg:4,honey:14,ginger:12}},
-  {id:'fruit_ore',        genre:'dessert', name:'あくまのキッスフルーツオレ',icon:'🥛',baseEnergy:4734,
-   ingredients:{cacao:8,milk:9,apple:11,honey:7}},
-  {id:'choco_cake',       genre:'dessert', name:'あまいかおりチョコケーキ', icon:'🎂', baseEnergy:3378,
-   ingredients:{cacao:8,milk:7,honey:9}},
-];
-
-const DAYS  = ['月','火','水','木','金','土','日'];
-const BLOCKS = [
-  {id:'morning', label:'朝', time:'4:00〜11:59',   hours:8,  cls:'morning'},
-  {id:'noon',    label:'昼', time:'12:00〜17:59',  hours:6,  cls:'noon'},
-  {id:'night',   label:'夜', time:'18:00〜翌3:59', hours:10, cls:'night'},
-];
-const SKILL_BONUS_PER_LV = [0,6,7,8,9,9,10];
-const DEFAULT_SUCCESS_RATE = 10;
-const SUNDAY_BONUS = 20;
-const MAX_SKILL_RATE = 70;
-const BLOCK_RATIO = {morning:8/24, noon:6/24, night:10/24};
-
-// おてつだいボーナス倍率（在籍ボーナス持ち匹数→倍率）
-// 基準2277に対して：1匹=2386, 2匹=2528, 3匹=2657, 4匹=2854
-const OTETSUDAI_BONUS_RATE = [1.000, 1.048, 1.111, 1.167, 1.254];
-
-// ===== 共通データ =====
-let pokemonList = [
-  {id:1,name:'ピカチュウ', kinomi:8000,  ing:[{type:'apple',count:3},{type:'none',count:0},{type:'none',count:0}], hasSkill:false,skillLv:1,skillPerDay:0,isGenkiAll:false,hasOtetsudaiBonus:false},
-  {id:2,name:'カビゴン',   kinomi:12000, ing:[{type:'potato',count:5},{type:'none',count:0},{type:'none',count:0}], hasSkill:false,skillLv:1,skillPerDay:0,isGenkiAll:false,hasOtetsudaiBonus:false},
-  {id:3,name:'イーブイ',   kinomi:6500,  ing:[{type:'mushroom',count:2},{type:'none',count:0},{type:'none',count:0}], hasSkill:true,skillLv:3,skillPerDay:1,isGenkiAll:false,hasOtetsudaiBonus:false},
-  {id:4,name:'ゲンガー',   kinomi:9500,  ing:[{type:'apple',count:2},{type:'pumpkin',count:3},{type:'none',count:0}], hasSkill:false,skillLv:1,skillPerDay:0,isGenkiAll:false,hasOtetsudaiBonus:false},
-  {id:5,name:'ヒトカゲ',   kinomi:7200,  ing:[{type:'potato',count:4},{type:'none',count:0},{type:'none',count:0}], hasSkill:false,skillLv:1,skillPerDay:0,isGenkiAll:false,hasOtetsudaiBonus:false},
-];
-let nextPokemonId = 6;
-
-const stockData = {};
-INGREDIENTS.forEach(i=>{ stockData[i.id]=0; });
-
-const recipeSettings = {};
-RECIPES.forEach(r=>{ recipeSettings[r.id]={energy: r.baseEnergy}; });
-
-let globalFB = 0; // フィールドボーナス%
-
-// ===== A/B独立データ =====
-function makeShift() {
-  const s={};
-  DAYS.forEach(d=>{ s[d]={}; BLOCKS.forEach(b=>{ s[d][b.id]=[1,2,3,4,5]; }); });
-  return s;
-}
-function makeMeal() {
-  const m={};
-  DAYS.forEach(d=>{ m[d]={}; BLOCKS.forEach(b=>{ m[d][b.id]={recipe:'tomato_curry'}; }); });
-  return m;
-}
-
-const abData = {
-  A: { shift: makeShift(), meal: makeMeal() },
-  B: { shift: makeShift(), meal: makeMeal() },
-};
-
-let currentAB = 'A';
-let currentMealDay = '月';
-let currentMealGenre = 'curry'; // 選択中の料理ジャンル
-let _md, _mb, _ms;
-
-// ===== ジャンル選択 =====
-function selectGenre(genre, btn) {
-  currentMealGenre = genre;
-  document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  // ジャンル変更時は全食事をそのジャンルの先頭レシピにリセット
-  const firstRecipe = RECIPES.find(r => r.genre === genre);
-  if (firstRecipe) {
-    DAYS.forEach(d => BLOCKS.forEach(b => {
-      const m = abData[currentAB].meal[d][b.id];
-      if (m.recipe !== 'none') m.recipe = firstRecipe.id;
-    }));
-  }
-  renderMealGrid();
-}
-
-// ===== A/B切替 =====
-function switchAB(ab) {
-  currentAB = ab;
-  document.getElementById('btnA').classList.toggle('active', ab==='A');
-  document.getElementById('btnB').classList.toggle('active', ab==='B');
-  // 現在表示中のページを再描画
-  const active = document.querySelector('.page.active');
-  if (!active) return;
-  const id = active.id.replace('page-','');
-  if (id==='shift')     { renderShiftTable(); updateAbNotes(); }
-  if (id==='meal-plan') { renderMealTabs(); renderMealGrid(); updateAbNotes(); }
-  if (id==='summary')   { renderSummary(); updateAbNotes(); }
-}
-
-function updateAbNotes() {
-  const col = currentAB==='A' ? 'var(--colA)' : 'var(--colB)';
-  const bg  = currentAB==='A' ? 'var(--colA-light)' : 'var(--colB-light)';
-  const note = `<span style="background:${bg};color:${col};padding:2px 10px;border-radius:20px;font-weight:800;">パターン${currentAB} を編集中</span>`;
-  ['shiftAbNote','mealAbNote','summaryAbNote'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.innerHTML=note;
-  });
-}
-
-function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  btn.classList.add('active');
-  if (id==='shift')          { renderShiftTable(); updateAbNotes(); }
-  if (id==='summary')        { renderSummary(); updateAbNotes(); }
-  if (id==='meal-plan')      { renderMealTabs(); renderMealGrid(); updateAbNotes(); }
-  if (id==='recipe-setting') renderRecipeSettings();
-  if (id==='stock')          renderStock();
-  if (id==='compare')        renderCompare();
-}
-
-// ===== ショートカット：現在A/Bのデータを取得 =====
-const shift = () => abData[currentAB].shift;
-const meal  = () => abData[currentAB].meal;
-
-// ===== ① ポケモン設定（共通） =====
-function renderPokemonGrid() {
-  document.getElementById('pokemonGrid').innerHTML = pokemonList.map((p,i)=>`
-    <div class="pokemon-card">
-      <div class="pokemon-card-header">
-        <span class="pokemon-num-badge">No.${i+1}</span>
-        <button class="btn btn-danger btn-sm" onclick="removePokemon(${p.id})" ${pokemonList.length<=1?'disabled':''}>削除</button>
-      </div>
-      <div class="field-label">ポケモン名</div>
-      <input type="text" value="${p.name}" placeholder="ポケモン名" onchange="updatePokemon(${p.id},'name',this.value)">
-      <div style="margin-top:.65rem;">
-        <div class="field-label">🍃 きのみエナジー（1日）</div>
-        <input type="number" value="${p.kinomi}" min="0" placeholder="例: 8000" onchange="updatePokemon(${p.id},'kinomi',+this.value)">
-      </div>
-      <div class="field-label">食材（最大3種）</div>
-      ${p.ing.map((ing,ii)=>`
-        <div style="margin-bottom:.3rem;">
-          <div class="slot-label">食材${ii+1}</div>
-          <div class="ingredient-row">
-            <select onchange="updateIngType(${p.id},${ii},this.value)">
-              ${[ING_NONE,...INGREDIENTS].map(x=>`<option value="${x.id}" ${ing.type===x.id?'selected':''}>${x.icon?x.icon+' ':''}${x.name}</option>`).join('')}
-            </select>
-            <input type="number" value="${ing.count}" min="0" placeholder="個数"
-              ${ing.type==='none'?'disabled style="opacity:.4"':''}
-              onchange="updateIngCount(${p.id},${ii},+this.value)">
-          </div>
-        </div>`).join('')}
-      <!-- メインスキル -->
-      <div class="skill-section" style="margin-top:.7rem;">
-        <div style="font-size:.6rem;font-weight:900;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;">メインスキル</div>
-        <div class="skill-toggle-row" onclick="toggleSkill(${p.id})">
-          <div class="toggle-box ${p.hasSkill?'on':''}"></div>
-          <span class="skill-toggle-label">🍳 料理チャンス持ち</span>
-        </div>
-        ${p.hasSkill?`
-          <div class="skill-detail">
-            <div>
-              <div class="field-label">スキルLv</div>
-              <select onchange="updatePokemon(${p.id},'skillLv',+this.value)">
-                ${[1,2,3,4,5,6].map(l=>`<option value="${l}" ${p.skillLv===l?'selected':''}>Lv.${l}（+${SKILL_BONUS_PER_LV[l]}%）</option>`).join('')}
-              </select>
-            </div>
-            <div>
-              <div class="field-label">1日の発動回数</div>
-              <input type="number" value="${p.skillPerDay}" min="0" max="20" onchange="updatePokemon(${p.id},'skillPerDay',+this.value)">
-            </div>
-          </div>
-          <div style="margin-top:.45rem;font-size:.66rem;color:var(--purple);">
-            ${p.skillPerDay}回発動 → +${Math.min(SKILL_BONUS_PER_LV[p.skillLv]*p.skillPerDay,MAX_SKILL_RATE)}%（上限${MAX_SKILL_RATE}%）
-          </div>`:''}
-        <div style="margin-top:.5rem;">
-          <div class="skill-toggle-row" onclick="toggleFlag(${p.id},'isGenkiAll')">
-            <div class="toggle-box ${p.isGenkiAll?'on':''}"></div>
-            <span class="skill-toggle-label" style="color:var(--green);">💚 げんきオール持ち</span>
-          </div>
-        </div>
-      </div>
-      <!-- サブスキル -->
-      <div class="skill-section" style="margin-top:.5rem;background:var(--orange-light);border-color:#fed7aa;">
-        <div style="font-size:.6rem;font-weight:900;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;">サブスキル</div>
-        <div class="skill-toggle-row" onclick="toggleFlag(${p.id},'hasOtetsudaiBonus')">
-          <div class="toggle-box ${p.hasOtetsudaiBonus?'on':''}"></div>
-          <span class="skill-toggle-label" style="color:var(--orange);">⚡ おてつだいボーナス持ち</span>
-        </div>
-        ${p.hasOtetsudaiBonus?`<div style="margin-top:.35rem;font-size:.65rem;color:var(--orange);">きのみ・食材をボーナス倍率で補正（シフト内在籍匹数による）</div>`:''}
-      </div>
-    </div>`).join('');
-  const btn=document.getElementById('addPokemonBtn');
-  btn.disabled=pokemonList.length>=20;
-  btn.textContent=pokemonList.length>=20?'上限20匹です':'＋ ポケモンを追加';
-}
-
-function toggleSkill(id){const p=pokemonList.find(x=>x.id===id);if(p){p.hasSkill=!p.hasSkill;renderPokemonGrid();}}
-function toggleFlag(id,flag){const p=pokemonList.find(x=>x.id===id);if(p){p[flag]=!p[flag];renderPokemonGrid();}}
-function updatePokemon(id,key,val){
-  const p=pokemonList.find(x=>x.id===id); if(p) p[key]=val;
-  if(key==='name') renderShiftTable();
-  if(key==='skillLv'||key==='skillPerDay') renderPokemonGrid();
-}
-function updateIngType(pokemonId,slot,val){
-  const p=pokemonList.find(x=>x.id===pokemonId); if(!p) return;
-  p.ing[slot].type=val; if(val==='none') p.ing[slot].count=0; renderPokemonGrid();
-}
-function updateIngCount(pokemonId,slot,val){const p=pokemonList.find(x=>x.id===pokemonId);if(p)p.ing[slot].count=val;}
+/* ─── add / delete / toggle ─── */
 function addPokemon(){
-  if(pokemonList.length>=20) return;
-  pokemonList.push({id:nextPokemonId++,name:`ポケモン${pokemonList.length+1}`,kinomi:0,
-    ing:[{type:'none',count:0},{type:'none',count:0},{type:'none',count:0}],
-    hasSkill:false,skillLv:1,skillPerDay:0,isGenkiAll:false,hasOtetsudaiBonus:false});
-  renderPokemonGrid();
+  const id=nextId++;
+  pokemons.push({id,name:'',emoji:EMOJIS[(id-1)%EMOJIS.length],curLv:14,goalLv:50,remExp:'',nature:'1',expType:'1',segments:[{from:14,to:50,boost:4}],open:true,checked:true,result:null});
+  renderAll();
+  setTimeout(()=>{const el=document.getElementById('name-'+id);if(el)el.focus();},50);
 }
-function removePokemon(id){
-  if(pokemonList.length<=1) return;
-  pokemonList=pokemonList.filter(p=>p.id!==id);
-  ['A','B'].forEach(ab=>DAYS.forEach(d=>BLOCKS.forEach(b=>{
-    abData[ab].shift[d][b.id]=abData[ab].shift[d][b.id].filter(pid=>pid!==id);
-    while(abData[ab].shift[d][b.id].length<5) abData[ab].shift[d][b.id].push(null);
-  })));
-  renderPokemonGrid();
+function deletePokemon(id){pokemons=pokemons.filter(p=>p.id!==id);renderAll();}
+function toggleCard(id){const p=pokemons.find(x=>x.id===id);if(p){p.open=!p.open;renderAll();}}
+function toggleCheck(id){
+  const p=pokemons.find(x=>x.id===id);
+  if(p){p.checked=!p.checked;renderAll();}
 }
 
-// ===== ② シフト表（A/B独立） =====
-function renderShiftTable(){
-  const table=document.getElementById('shiftTable'); if(!table) return;
-  const sd=shift();
-
-  // 曜日ヘッダー（クリックで曜日一括変更）
-  const thead=`<thead>
-    <tr>
-      <th style="text-align:left;padding-left:.7rem;min-width:85px;">ブロック</th>
-      ${DAYS.map(d=>`
-        <th>
-          <div>${d}曜</div>
-          <button class="bulk-day-btn" onclick="openBulkDayModal('${d}')" title="${d}曜日の枠を一括変更">
-            📋 一括
-          </button>
-        </th>`).join('')}
-    </tr>
-  </thead>`;
-
-  // 枠番号ヘッダー行（1〜5枠の一括変更ボタン）
-  const slotHeader=`<tr class="slot-header-row">
-    <td style="padding:.3rem .5rem;">
-      <span style="font-size:.6rem;color:var(--text-dim);font-weight:800;">枠一括変更 ▶</span>
-    </td>
-    ${Array.from({length:5},(_,si)=>`
-      <td colspan="1" style="padding:.2rem .3rem;">
-        <button class="bulk-slot-btn" onclick="openBulkSlotModal(${si})">
-          ${si+1}枠目<br>一括
-        </button>
-      </td>`).join('')}
-    <td colspan="${DAYS.length - 5}"></td>
-  </tr>`;
-
-  // 実際のシフト行（ブロック×曜日）
-  // 表の列：ブロックラベル | 月〜日（各日に5スロット）
-  // → 枠ヘッダーは別テーブルにして重ねると複雑なので、
-  //    表の右にまとめて枠一括ボタン列を置く構造にする
-  const rows=BLOCKS.map(b=>`
-    <tr>
-      <td style="padding-left:.5rem;white-space:nowrap;">
-        <span class="shift-label ${b.cls}">${b.label}</span>
-        <span class="shift-time-hint">${b.time}</span>
-        <button class="bulk-day-btn" style="margin-top:3px;" onclick="openBulkModal('block','${b.id}')">📋 全曜日一括</button>
-      </td>
-      ${DAYS.map(d=>{
-        const slots=sd[d][b.id];
-        const html=Array.from({length:5},(_,si)=>{
-          const pid=slots[si]??null;
-          const poke=pid?pokemonList.find(p=>p.id===pid):null;
-          return `<div class="shift-slot ${poke?'filled':''}" onclick="openSlotModal('${d}','${b.id}',${si})">${poke?poke.name.slice(0,4):'＋'}</div>`;
-        }).join('');
-        // げんきオール持ちが1匹もいないか判定
-        const hasGenki=slots.filter(Boolean).some(pid=>pokemonList.find(p=>p.id===pid&&p.isGenkiAll));
-        const genkiWarning=pokemonList.some(p=>p.isGenkiAll)&&!hasGenki
-          ?`<div class="no-genki-badge">💚不在</div>`:'';
-        return `<td><div class="shift-slots${!hasGenki&&pokemonList.some(p=>p.isGenkiAll)?' no-genki':''}">${html}</div>${genkiWarning}</td>`;
-      }).join('')}
-    </tr>`).join('');
-
-  table.innerHTML=thead+`<tbody>${rows}</tbody>`;
-
-  // 枠一括ボタンエリアを表の下に別途描画
-  renderSlotBulkArea();
-}
-
-function renderSlotBulkArea(){
-  const el=document.getElementById('slotBulkArea'); if(!el) return;
-  el.innerHTML=`
-    <div style="display:flex;flex-wrap:wrap;gap:.4rem;padding:.4rem 0;align-items:center;">
-      <span style="font-size:.68rem;font-weight:800;color:var(--text-mid);white-space:nowrap;">枠ごと一括：</span>
-      ${Array.from({length:5},(_,si)=>`<button class="bulk-slot-btn" onclick="openBulkModal('slot',${si})">${si+1}枠目（全日）</button>`).join('')}
-    </div>`;
-}
-
-// ===== 一括変更モーダル（複数選択対応） =====
-// _bulkMode: 'day' | 'block' | 'slot'
-// _bulkDay: 曜日文字列（dayモード）
-// _bulkBlock: ブロックid（blockモード）
-// _bulkSlot: スロットインデックス（slotモード）
-let _bulkMode=null, _bulkDay=null, _bulkBlock=null, _bulkSlot=null;
-let _bulkSelected=[]; // 選択中のpidリスト（順序あり）
-
-function openBulkDayModal(day){
-  _bulkMode='day'; _bulkDay=day;
-  openBulkModal('day', day);
-}
-
-function openBulkModal(mode, target){
-  _bulkSelected=[];
-  if(mode==='day'){
-    _bulkMode='day'; _bulkDay=target;
-    document.getElementById('modalTitle').textContent=`${target}曜日を一括変更（最大5匹選択）`;
-  } else if(mode==='block'){
-    _bulkMode='block'; _bulkBlock=target;
-    const b=BLOCKS.find(x=>x.id===target);
-    document.getElementById('modalTitle').textContent=`${b.label}（全曜日）を一括変更（最大5匹）`;
-  } else if(mode==='slot'){
-    _bulkMode='slot'; _bulkSlot=target;
-    document.getElementById('modalTitle').textContent=`${target+1}枠目（全日全ブロック）を一括変更`;
+/* ─── calc ─── */
+function calcPokemon(id){
+  const p=pokemons.find(x=>x.id===id);
+  if(!p)return;
+  syncFromDOM(p);
+  const cur=p.curLv,goal=p.goalLv;
+  if(goal<=cur){alert('目標レベルは現在のレベルより大きくしてください');return;}
+  const remExp=p.remExp===''?null:parseInt(p.remExp);
+  const natureMult=parseFloat(p.nature);
+  const expTypeMult=parseFloat(p.expType);
+  const covered=new Set();
+  const segs=[];
+  p.segments.forEach(s=>{for(let lv=s.from;lv<s.to;lv++)covered.add(lv);segs.push({...s});});
+  const noBoost=[];
+  let start=null;
+  for(let lv=cur;lv<goal;lv++){
+    if(!covered.has(lv)){if(start===null)start=lv;}
+    else{if(start!==null){noBoost.push({from:start,to:lv,boost:1});start=null;}}
   }
-  renderBulkModal();
-  document.getElementById('modalOverlay').classList.remove('hidden');
-}
-
-function renderBulkModal(){
-  const selCount=_bulkSelected.length;
-  const html=`
-    <div style="margin-bottom:.7rem;">
-      <div style="font-size:.68rem;color:var(--text-dim);margin-bottom:.4rem;">
-        選択中（${selCount}/5匹）：選んだ順に1〜5枠目に適用されます
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:.3rem;min-height:28px;background:var(--surface2);border-radius:8px;padding:.3rem .5rem;">
-        ${_bulkSelected.length===0
-          ? `<span style="font-size:.68rem;color:var(--text-dim);">未選択</span>`
-          : _bulkSelected.map((pid,i)=>{
-              const p=pokemonList.find(x=>x.id===pid);
-              return `<span style="background:var(--blue);color:#fff;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;cursor:pointer;"
-                onclick="removeBulkSelected(${pid})">
-                ${i+1}. ${p?p.name:'?'} ✕
-              </span>`;
-            }).join('')}
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.4rem;margin-bottom:.5rem;">
-      <button class="modal-poke-btn" onclick="applyBulk([])"
-        style="border-color:var(--pink);color:var(--pink);grid-column:1/-1;">
-        ✕ 対象スロットを全て空にする
-      </button>
-      ${pokemonList.map(p=>{
-        const sel=_bulkSelected.includes(p.id);
-        const idx=_bulkSelected.indexOf(p.id);
-        return `<button class="modal-poke-btn ${sel?'bulk-selected':''}"
-          onclick="toggleBulkSelect(${p.id})"
-          ${sel?'style="border-color:var(--blue);color:var(--blue);background:var(--blue-light);"':''}>
-          ${sel?`<span style="font-size:.6rem;font-weight:900;color:var(--blue);">${idx+1}. </span>`:''}${p.name}
-        </button>`;
-      }).join('')}
-    </div>
-    <button class="btn btn-primary" style="width:100%;margin-top:.3rem;"
-      onclick="applyBulk(_bulkSelected)" ${selCount===0?'disabled':''}>
-      ✅ ${selCount}匹で一括適用
-    </button>`;
-  document.getElementById('modalPokeList').innerHTML=html;
-}
-
-function toggleBulkSelect(pid){
-  const idx=_bulkSelected.indexOf(pid);
-  if(idx>=0){
-    _bulkSelected.splice(idx,1);
-  } else {
-    if(_bulkSelected.length>=5) return;
-    _bulkSelected.push(pid);
-  }
-  renderBulkModal();
-}
-
-function removeBulkSelected(pid){
-  _bulkSelected=_bulkSelected.filter(p=>p!==pid);
-  renderBulkModal();
-}
-
-function applyBulk(pids){
-  const sd=shift();
-  // 対象セルのリストを作る
-  let targets=[]; // [{day, blockId}]
-  if(_bulkMode==='day'){
-    BLOCKS.forEach(b=>targets.push({day:_bulkDay, blockId:b.id}));
-  } else if(_bulkMode==='block'){
-    DAYS.forEach(d=>targets.push({day:d, blockId:_bulkBlock}));
-  } else if(_bulkMode==='slot'){
-    // slotモードは全day×全block の指定枠のみ変更
-    DAYS.forEach(d=>BLOCKS.forEach(b=>{
-      sd[d][b.id][_bulkSlot] = pids.length>0 ? (pids[0]??null) : null;
-    }));
-    closeModal(); renderShiftTable(); return;
-  }
-  // day・blockモード：各セルの5スロットをpidsで上書き
-  targets.forEach(({day,blockId})=>{
-    for(let si=0;si<5;si++){
-      sd[day][blockId][si] = pids[si]??null;
+  if(start!==null)noBoost.push({from:start,to:goal,boost:1});
+  const allSegs=[...segs,...noBoost].sort((a,b)=>a.from-b.from);
+  let totalC=0,totalY=0;
+  const breakdown=[];
+  let isFirst=true;
+  allSegs.forEach(seg=>{
+    let c=0,y=0;
+    for(let lv=seg.from;lv<seg.to;lv++){
+      let needed;
+      if(lv===seg.from&&isFirst&&remExp!==null)needed=remExp*expTypeMult;
+      else needed=EXP_TABLE[lv+1]*expTypeMult;
+      const expPerC=candyExp(lv+1)*seg.boost*natureMult;
+      const cnt=Math.ceil(needed/expPerC);
+      c+=cnt;
+      const ym=seg.boost>1?(seg.boost-1):1;
+      y+=cnt*YUME_TABLE[lv+1]*ym;
+      isFirst=false;
     }
+    totalC+=c;totalY+=y;
+    breakdown.push({from:seg.from,to:seg.to,boost:seg.boost,c:Math.ceil(c),y:Math.ceil(y)});
   });
-  closeModal(); renderShiftTable();
+  p.result={totalC:Math.ceil(totalC),totalY:Math.ceil(totalY),breakdown};
+  renderAll();
 }
 
-function openSlotModal(day,block,slotIdx){
-  _bulkMode=null;
-  _md=day;_mb=block;_ms=slotIdx;
-  const sd=shift();
-  const curPid=sd[day][block][slotIdx]??null;
-  const used=sd[day][block].filter((_,i)=>i!==slotIdx).filter(Boolean);
-  document.getElementById('modalTitle').textContent='ポケモンを選択';
-  let html=`<button class="modal-poke-btn" onclick="selectSlot(null)" style="border-color:var(--pink);color:var(--pink);">✕ スロットを空にする</button>`;
-  html+=pokemonList.map(p=>{
-    const a=used.includes(p.id)?'already':'';
-    const c=p.id===curPid?'style="border-color:var(--blue);color:var(--blue);background:var(--blue-light);"':'';
-    return `<button class="modal-poke-btn ${a}" ${a?'disabled':''} ${c} onclick="selectSlot(${p.id})">${p.name}</button>`;
-  }).join('');
-  document.getElementById('modalPokeList').innerHTML=html;
-  document.getElementById('modalOverlay').classList.remove('hidden');
-}
-function selectSlot(pid){shift()[_md][_mb][_ms]=pid;closeModal();renderShiftTable();}
-function closeModal(){document.getElementById('modalOverlay').classList.add('hidden');}
-
-// ===== ③ 食材備蓄（共通） =====
-function renderStock(){
-  document.getElementById('stockGrid').innerHTML=INGREDIENTS.map(ing=>`
-    <div class="stock-item">
-      <div class="stock-name">${ing.icon} ${ing.name}</div>
-      <div class="stock-ctrl">
-        <button class="stock-btn" onclick="changeStock('${ing.id}',-1)">−</button>
-        <input type="number" class="stock-val" id="stock-${ing.id}" value="${stockData[ing.id]||0}" min="0" onchange="stockData['${ing.id}']=+this.value">
-        <button class="stock-btn" onclick="changeStock('${ing.id}',1)">＋</button>
-      </div>
-    </div>`).join('');
-}
-function changeStock(id,d){stockData[id]=Math.max(0,(stockData[id]||0)+d);const el=document.getElementById('stock-'+id);if(el)el.value=stockData[id];}
-
-// ===== 料理エナジー（FB込み） =====
-function recipeEnergyWithFB(recipeId){
-  const base=recipeSettings[recipeId]?.energy||0;
-  return Math.round(base*(1+globalFB/100));
+/* ─── sync DOM → data ─── */
+function syncFromDOM(p){
+  const nEl=document.getElementById('name-'+p.id);if(nEl)p.name=nEl.value;
+  const cEl=document.getElementById('cur-'+p.id);if(cEl)p.curLv=parseInt(cEl.value);
+  const gEl=document.getElementById('goal-'+p.id);if(gEl)p.goalLv=parseInt(gEl.value);
+  const rEl=document.getElementById('rem-'+p.id);if(rEl)p.remExp=rEl.value;
+  const nat=document.querySelector('input[name="nat-'+p.id+'"]:checked');if(nat)p.nature=nat.value;
+  const et=document.querySelector('input[name="et-'+p.id+'"]:checked');if(et)p.expType=et.value;
+  const fromEls=document.querySelectorAll('.seg-from-'+p.id);
+  const toEls=document.querySelectorAll('.seg-to-'+p.id);
+  const boostEls=document.querySelectorAll('.seg-boost-'+p.id);
+  fromEls.forEach((el,i)=>{if(p.segments[i])p.segments[i].from=parseInt(el.value);});
+  toEls.forEach((el,i)=>{if(p.segments[i])p.segments[i].to=parseInt(el.value);});
+  boostEls.forEach((el,i)=>{if(p.segments[i])p.segments[i].boost=parseFloat(el.value);});
 }
 
-let currentRecipeGenreTab = 'curry';
-
-function selectRecipeGenreTab(genre) {
-  currentRecipeGenreTab = genre;
-  ['curry','salad','dessert'].forEach(g => {
-    const el = document.getElementById('rtab-'+g);
-    if (el) el.classList.toggle('active', g===genre);
-  });
-  renderRecipeSettings();
+/* ─── segment ops ─── */
+function addSegment(id){
+  const p=pokemons.find(x=>x.id===id);if(!p)return;
+  syncFromDOM(p);
+  const from=p.segments.length>0?p.segments[p.segments.length-1].to:p.curLv;
+  const to=Math.min(from+10,p.goalLv);
+  if(from>=p.goalLv)return;
+  p.segments.push({from,to,boost:4});
+  renderAll();
+}
+function deleteSegment(id,idx){
+  const p=pokemons.find(x=>x.id===id);if(!p)return;
+  syncFromDOM(p);
+  p.segments.splice(idx,1);
+  renderAll();
+}
+function setEmoji(id,emoji){
+  const p=pokemons.find(x=>x.id===id);if(!p)return;
+  syncFromDOM(p);
+  p.emoji=emoji;
+  renderAll();
 }
 
-function renderRecipeSettings(){
-  const GENRE_LABELS = {curry:'🍛 カレー・シチュー', salad:'🥗 サラダ', dessert:'🧇 デザート・ドリンク'};
-  const list = RECIPES.filter(r => r.genre === currentRecipeGenreTab);
-  const cards = list.map(r => {
-    const energy = recipeSettings[r.id]?.energy ?? r.baseEnergy;
-    const withFB = Math.round(energy*(1+globalFB/100));
-    const ings = Object.entries(r.ingredients).map(([k,v]) => {
-      const ing = INGREDIENTS.find(i=>i.id===k);
-      return `<span class="ing-tag">${ing?.icon||''}${ing?.name||k}×${v}</span>`;
-    }).join('');
-    return `
-      <div class="recipe-setting-card">
-        <div class="recipe-setting-name">${r.icon} ${r.name}</div>
-        <div style="margin-bottom:.5rem;line-height:1.8;">${ings}</div>
-        <div class="field-label">料理エナジー（初期値: ${r.baseEnergy.toLocaleString()}）</div>
-        <input type="number" value="${energy}" min="0" placeholder="${r.baseEnergy}"
-          onchange="recipeSettings['${r.id}'].energy=+this.value; renderRecipeSettings()">
-        ${globalFB>0?`<div style="margin-top:.3rem;font-size:.68rem;color:var(--orange);font-weight:700;">FB${globalFB}% 適用後: ${withFB.toLocaleString()}</div>`:''}
-      </div>`;
-  }).join('');
-  document.getElementById('recipeSettingGrid').innerHTML = `<div class="recipe-settings-grid">${cards}</div>`;
-}
+/* ─── export / import ─── */
+function syncAll(){pokemons.forEach(p=>syncFromDOM(p));}
 
-// ===== 週の食材収集量を計算（シフト表から） =====
-// 各食材が週全体で何個取れるか（按分込み）
-function calcWeekIngredients(ab) {
-  const sd = abData[ab].shift;
-  const totals = {};
-  INGREDIENTS.forEach(i=>{ totals[i.id]=0; });
-  DAYS.forEach(d=>{
-    BLOCKS.forEach(b=>{
-      sd[d][b.id].filter(Boolean).forEach(pid=>{
-        const poke=pokemonList.find(p=>p.id===pid); if(!poke) return;
-        poke.ing.forEach(ing=>{
-          if(ing.type!=='none' && ing.count>0){
-            totals[ing.type]=(totals[ing.type]||0)+ing.count*BLOCK_RATIO[b.id];
-          }
-        });
-      });
-    });
-  });
-  return totals;
-}
-
-// ある時点（月〜日・朝昼夜）での食材累計を計算
-function calcIngUpTo(ab, targetDay, targetBlock){
-  const sd=abData[ab].shift;
-  const totals={};
-  INGREDIENTS.forEach(i=>{totals[i.id]=0;});
-  const dayIdx=DAYS.indexOf(targetDay);
-  const blockIdx=BLOCKS.findIndex(b=>b.id===targetBlock);
-  for(let di=0;di<=dayIdx;di++){
-    const d=DAYS[di];
-    const maxBi = di<dayIdx ? BLOCKS.length-1 : blockIdx;
-    for(let bi=0;bi<=maxBi;bi++){
-      const b=BLOCKS[bi];
-      sd[d][b.id].filter(Boolean).forEach(pid=>{
-        const poke=pokemonList.find(p=>p.id===pid); if(!poke) return;
-        poke.ing.forEach(ing=>{
-          if(ing.type!=='none'&&ing.count>0)
-            totals[ing.type]=(totals[ing.type]||0)+ing.count*BLOCK_RATIO[b.id];
-        });
-      });
-    }
-  }
-  return totals;
-}
-
-// 料理の実行可否チェック
-function checkFeasibility(ab, day, block, recipeId){
-  const recipe=RECIPES.find(r=>r.id===recipeId); if(!recipe) return {cls:'ok',label:'✓ 可能'};
-  const available={};
-  INGREDIENTS.forEach(i=>{available[i.id]=(stockData[i.id]||0);});
-  // その時点までの収集量を加算
-  const collected=calcIngUpTo(ab,day,block);
-  INGREDIENTS.forEach(i=>{available[i.id]+=collected[i.id]||0;});
-
-  // その時点より前の料理で使った分を引く
-  const dayIdx=DAYS.indexOf(day);
-  const blockIdx=BLOCKS.findIndex(b=>b.id===block);
-  for(let di=0;di<=dayIdx;di++){
-    const d=DAYS[di];
-    const maxBi=di<dayIdx?BLOCKS.length-1:blockIdx-1;
-    for(let bi=0;bi<=maxBi;bi++){
-      const b=BLOCKS[bi];
-      const m=abData[ab].meal[d][b.id];
-      const r=RECIPES.find(x=>x.id===m.recipe);
-      if(r) Object.entries(r.ingredients).forEach(([k,v])=>{available[k]=(available[k]||0)-v;});
-    }
-  }
-
-  const missing=[];
-  const short=[];
-  Object.entries(recipe.ingredients).forEach(([k,v])=>{
-    const have=available[k]||0;
-    if(have<v*0.5) missing.push(k);
-    else if(have<v) short.push(k);
-  });
-  if(missing.length>0) return {cls:'ng',  label:`✗ ${missing.map(k=>INGREDIENTS.find(i=>i.id===k)?.icon||k).join('')}不足`};
-  if(short.length>0)   return {cls:'warn',label:`△ ${short.map(k=>INGREDIENTS.find(i=>i.id===k)?.icon||k).join('')}不足気味`};
-  return {cls:'ok',label:'✓ 食材OK'};
-}
-
-// ===== 大成功確率の期待値計算（週またぎで引き継ぎ） =====
-function calcWeekRecipeExpected(ab){
-  const sd=abData[ab].shift; const md=abData[ab].meal;
-  let weekTotal=0,weekNormal=0,weekMax=0;
-  const dailyDetails=[];
-  // 状態：月曜朝からcarry=0でスタート、週全体で引き継ぎ
-  let states=[{prob:1.0,carry:0}];
-
-  DAYS.forEach(d=>{
-    const isSunday=d==='日';
-    const sundayBonus=isSunday?SUNDAY_BONUS:0;
-    const allPids=[...new Set(BLOCKS.flatMap(b=>sd[d][b.id].filter(Boolean)))];
-    const skillBonus=Math.min(
-      pokemonList.filter(p=>p.hasSkill&&allPids.includes(p.id))
-        .reduce((s,p)=>s+SKILL_BONUS_PER_LV[p.skillLv]*p.skillPerDay,0),
-      MAX_SKILL_RATE
-    );
-    let dayTotal=0,dayNormal=0,dayMax=0;
-    const mealDetails=[];
-
-    BLOCKS.forEach(b=>{
-      const m=md[d][b.id];
-      const isSkip = m.recipe==='none'; // 何も作らない
-      const baseEnergy=isSkip?0:recipeEnergyWithFB(m.recipe);
-      const baseRaw=isSkip?0:(recipeSettings[m.recipe]?.energy||0);
-      const multiplier=isSunday?3:2;
-      let expectedEnergy=0;
-      const nextStates=[];
-
-      if(isSkip){
-        // 料理しない：確率はそのまま引き継ぎ、statesは変更しない
-        states.forEach(s=>nextStates.push(s));
-      } else {
-        states.forEach(({prob,carry})=>{
-          const rawRate=DEFAULT_SUCCESS_RATE+carry+skillBonus+sundayBonus;
-          const p=Math.min(rawRate,100)/100;
-          expectedEnergy+=prob*(baseEnergy+baseEnergy*(multiplier-1)*p);
-          nextStates.push({prob:prob*p,    carry:0});
-          nextStates.push({prob:prob*(1-p),carry:Math.min(rawRate,100)});
-        });
-      }
-
-      states=mergeStates(nextStates);
-
-      dayTotal+=expectedEnergy;
-      dayNormal+=baseRaw;
-      dayMax+=isSkip?0:baseEnergy*multiplier;
-
-      const expCarry=states.reduce((s,st)=>s+st.prob*st.carry,0);
-      const displayRate=Math.min(DEFAULT_SUCCESS_RATE+expCarry+skillBonus+sundayBonus,100);
-      mealDetails.push({block:b.label,expectedEnergy:Math.round(expectedEnergy),baseEnergy,baseRaw,displayRate:Math.round(displayRate),skillBonus,sundayBonus,isSkip});
-    });
-
-    weekTotal+=dayTotal;
-    weekNormal+=dayNormal;
-    weekMax+=dayMax;
-    dailyDetails.push({day:d,total:Math.round(dayTotal),normal:dayNormal,max:dayMax,meals:mealDetails});
-  });
-
-  return {weekTotal:Math.round(weekTotal),weekNormal:Math.round(weekNormal*(1+globalFB/100)),weekMax:Math.round(weekMax),dailyDetails};
-}
-
-function mergeStates(states){
-  const map={};
-  states.forEach(({prob,carry})=>{
-    const key=Math.round(carry);
-    if(!map[key]) map[key]={prob:0,carry};
-    map[key].prob+=prob;
-  });
-  return Object.values(map).filter(s=>s.prob>0.0001);
-}
-
-// ===== ④ 料理予定表（A/B独立） =====
-function renderMealTabs(){
-  document.getElementById('mealDayTabs').innerHTML=DAYS.map(d=>`
-    <div class="day-tab ${d===currentMealDay?'active':''} ${d==='日'?'sunday':''}"
-      onclick="currentMealDay='${d}';renderMealTabs();renderMealGrid()">${d}曜日</div>`).join('');
-}
-
-function renderMealGrid(){
-  const d=currentMealDay; const ab=currentAB;
-  const isSunday=d==='日'; const sundayBonus=isSunday?SUNDAY_BONUS:0;
-  const sd=shift(); const md=meal();
-  const allPids=[...new Set(BLOCKS.flatMap(b=>sd[d][b.id].filter(Boolean)))];
-  const skillBonus=Math.min(
-    pokemonList.filter(p=>p.hasSkill&&allPids.includes(p.id))
-      .reduce((s,p)=>s+SKILL_BONUS_PER_LV[p.skillLv]*p.skillPerDay,0),MAX_SKILL_RATE);
-
-  // 月曜から当日の朝まで状態を進め、期待carryを計算
-  let states=[{prob:1.0,carry:0}];
-  const dayIdx=DAYS.indexOf(d);
-  for(let di=0;di<dayIdx;di++){
-    const dd=DAYS[di];
-    const isSun=dd==='日';
-    const sBonus=isSun?SUNDAY_BONUS:0;
-    const pids=[...new Set(BLOCKS.flatMap(b=>sd[dd][b.id].filter(Boolean)))];
-    const skBonus=Math.min(
-      pokemonList.filter(p=>p.hasSkill&&pids.includes(p.id))
-        .reduce((s,p)=>s+SKILL_BONUS_PER_LV[p.skillLv]*p.skillPerDay,0),MAX_SKILL_RATE);
-    BLOCKS.forEach(b=>{
-      const mm=abData[ab].meal[dd][b.id];
-      if(mm.recipe==='none'){ return; } // 料理しない→statesそのまま
-      const ns=[];
-      states.forEach(({prob,carry})=>{
-        const raw=DEFAULT_SUCCESS_RATE+carry+skBonus+sBonus;
-        const p=Math.min(raw,100)/100;
-        ns.push({prob:prob*p,    carry:0});
-        ns.push({prob:prob*(1-p),carry:Math.min(raw,100)});
-      });
-      states=mergeStates(ns);
-    });
-  }
-
-  // 期待carry = Σ(prob × carry) → 表示用の代表値として使う
-  const expectedCarry = ()=> states.reduce((s,st)=>s+st.prob*st.carry, 0);
-
-  document.getElementById('mealGrid').innerHTML=BLOCKS.map((b,bi)=>{
-    const m=md[d][b.id];
-    const isSkip=m.recipe==='none';
-    const baseEnergy=isSkip?0:recipeEnergyWithFB(m.recipe);
-    const baseRaw=isSkip?0:(recipeSettings[m.recipe]?.energy||0);
-    const multiplier=isSunday?3:2;
-    const carryDisplay=Math.round(expectedCarry());
-    const rawRate=DEFAULT_SUCCESS_RATE+carryDisplay+skillBonus+sundayBonus;
-    const displayRate=Math.min(rawRate,100);
-
-    let expectedEnergy=0;
-    const nextStates=[];
-    if(isSkip){
-      // 料理しない：確率引き継ぎ、statesそのまま
-      states.forEach(s=>nextStates.push(s));
-    } else {
-      states.forEach(({prob,carry})=>{
-        const raw=Math.min(DEFAULT_SUCCESS_RATE+carry+skillBonus+sundayBonus,100);
-        const p=raw/100;
-        expectedEnergy+=prob*(baseEnergy+baseEnergy*(multiplier-1)*p);
-        nextStates.push({prob:prob*p,    carry:0});
-        nextStates.push({prob:prob*(1-p),carry:Math.min(raw,100)});
-      });
-    }
-    states=mergeStates(nextStates);
-
-    const feasible=isSkip?{cls:'',label:''}:checkFeasibility(ab,d,b.id,m.recipe);
-
-    return `
-      <div class="meal-card">
-        <div class="meal-header">
-          <div class="meal-dot ${b.cls}"></div>
-          <div class="meal-title">${b.label}ごはん</div>
-          <div class="meal-time">${b.time}</div>
-        </div>
-        <div class="field-label">料理</div>
-        <select onchange="meal()['${d}']['${b.id}'].recipe=this.value;renderMealGrid()">
-          <option value="none" ${m.recipe==='none'?'selected':''}>— 何も作らない</option>
-          ${RECIPES.filter(r=>r.genre===currentMealGenre).map(r=>`<option value="${r.id}" ${r.id===m.recipe?'selected':''}>${r.icon} ${r.name}</option>`).join('')}
-        </select>
-        ${feasible.label?`<span class="feasibility ${feasible.cls}">${feasible.label}</span>`:''}
-        ${isSkip?`
-          <div class="prob-breakdown">
-            <div class="prob-row"><span>大成功確率</span><span style="color:var(--text-dim)">引き継ぎ中 ${Math.round(displayRate)}%</span></div>
-            <div style="font-size:.62rem;color:var(--text-dim);margin-top:2px;">料理しないため確率は次回へ引き継ぎ</div>
-          </div>
-          <div class="energy-box" style="background:var(--bg2);">
-            <div class="energy-box-label">エナジー</div>
-            <div class="energy-box-val" style="color:var(--text-dim);">0</div>
-          </div>
-        `:`
-        <div class="prob-breakdown">
-          <div class="prob-row"><span>デフォルト確率</span><span>${DEFAULT_SUCCESS_RATE}%</span></div>
-          ${carryDisplay>0?`<div class="prob-row"><span>前回からの引き継ぎ</span><span>+${carryDisplay}%</span></div>`:''}
-          ${skillBonus>0?`<div class="prob-row"><span>🍳 スキルボーナス</span><span>+${skillBonus}%</span></div>`:''}
-          ${sundayBonus>0?`<div class="prob-row"><span>🌟 日曜ボーナス</span><span>+${sundayBonus}%</span></div>`:''}
-          <div class="prob-row total"><span>大成功確率（期待値）</span><span>${Math.round(displayRate)}%</span></div>
-          ${rawRate>=100?`<div class="prob-cap">※ 100%上限</div>`:''}
-        </div>
-        <div class="energy-box">
-          <div class="energy-box-label">期待エナジー</div>
-          <div class="energy-box-val">${Math.round(expectedEnergy).toLocaleString()}</div>
-          <div class="energy-box-sub">
-            ベース(FB込) ${baseEnergy.toLocaleString()}
-            ${globalFB>0?`（元 ${baseRaw.toLocaleString()} + FB${globalFB}%）`:''}
-            ／ 大成功 ${(baseEnergy*multiplier).toLocaleString()}${isSunday?' (×3)':' (×2)'}
-          </div>
-        </div>`}
-      </div>`;
-  }).join('');
-}
-
-// ===== ⑤ 週間サマリー（A/B独立） =====
-function calcSummaryData(ab){
-  const sd=abData[ab].shift;
-  const pokemonWeekly=pokemonList.map(p=>{
-    let kinomi=0;
-    DAYS.forEach(d=>BLOCKS.forEach(b=>{
-      const blockPids=sd[d][b.id].filter(Boolean);
-      if(!blockPids.includes(p.id)) return;
-      // このブロックのおてつだいボーナス持ち在籍数
-      const bonusCount=Math.min(blockPids.filter(pid=>pokemonList.find(x=>x.id===pid&&x.hasOtetsudaiBonus)).length, 4);
-      const rate=OTETSUDAI_BONUS_RATE[bonusCount];
-      kinomi+=p.kinomi*BLOCK_RATIO[b.id]*rate;
-    }));
-    return {...p,weekKinomi:Math.round(kinomi)};
-  });
-  const totalKinomi=pokemonWeekly.reduce((s,p)=>s+p.weekKinomi,0);
-  const {weekTotal:weekRecipeTotal,weekNormal,weekMax,dailyDetails}=calcWeekRecipeExpected(ab);
-  const grandTotal=totalKinomi+weekRecipeTotal;
-  return {pokemonWeekly,totalKinomi,weekRecipeTotal,weekNormal,weekMax,grandTotal,dailyDetails};
-}
-
-function renderSummary(){
-  const ab=currentAB;
-  const {pokemonWeekly,totalKinomi,weekRecipeTotal,weekNormal,weekMax,grandTotal,dailyDetails}=calcSummaryData(ab);
-
-  document.getElementById('summaryKpis').innerHTML=`
-    <div class="kpi-card"><div class="kpi-label">週間合計エナジー</div>
-      <div class="kpi-val blue">${grandTotal.toLocaleString()}</div>
-      <div class="kpi-sub">1日平均 ${Math.round(grandTotal/7).toLocaleString()}</div></div>
-    <div class="kpi-card"><div class="kpi-label">きのみエナジー（週）</div>
-      <div class="kpi-val green">${totalKinomi.toLocaleString()}</div>
-      <div class="kpi-sub">${grandTotal>0?Math.round(totalKinomi/grandTotal*100):0}%</div></div>
-    <div class="kpi-card"><div class="kpi-label">料理エナジー（週・期待値）</div>
-      <div class="kpi-val orange">${weekRecipeTotal.toLocaleString()}</div>
-      <div class="kpi-sub">${grandTotal>0?Math.round(weekRecipeTotal/grandTotal*100):0}%</div></div>`;
-
-  document.getElementById('resultTable').innerHTML=`
-    <thead><tr>
-      <th>ポケモン</th>
-      <th style="text-align:right;">週間きのみエナジー</th>
-      <th style="text-align:right;">構成比</th>
-    </tr></thead>
-    <tbody>${pokemonWeekly.map(p=>{
-      const pct=totalKinomi>0?Math.round(p.weekKinomi/totalKinomi*100):0;
-      return `<tr>
-        <td>${p.name}${p.hasSkill?' <span style="font-size:.62rem;color:var(--purple);">🍳</span>':''}</td>
-        <td class="kinomi-val">${p.weekKinomi.toLocaleString()}</td>
-        <td style="text-align:right;color:var(--text-mid);">${pct}%</td>
-      </tr>`;
-    }).join('')}</tbody>
-    <tfoot><tr><td>合計</td><td>${totalKinomi.toLocaleString()}</td><td>100%</td></tr></tfoot>`;
-
-  document.getElementById('recipeTotalBox').innerHTML=`
-    <div class="rtb-item" style="background:var(--orange-light);">
-      <div class="rtb-label" style="color:var(--orange);">期待値合計</div>
-      <div class="rtb-val" style="color:var(--orange);">${weekRecipeTotal.toLocaleString()}</div>
-    </div>
-    <div class="rtb-item" style="background:var(--green-light);">
-      <div class="rtb-label" style="color:var(--green);">全失敗（最低）</div>
-      <div class="rtb-val" style="color:var(--green);">${weekNormal.toLocaleString()}</div>
-    </div>
-    <div class="rtb-item" style="background:#fef3c7;">
-      <div class="rtb-label" style="color:#92400e;">全成功（最高）</div>
-      <div class="rtb-val" style="color:#92400e;">${weekMax.toLocaleString()}</div>
-    </div>`;
-
-  const dailyKinomi=DAYS.map(d=>{
-    let k=0;
-    pokemonList.forEach(p=>BLOCKS.forEach(b=>{
-      if(abData[ab].shift[d][b.id].filter(Boolean).includes(p.id)) k+=p.kinomi*BLOCK_RATIO[b.id];
-    }));
-    return Math.round(k);
-  });
-  const maxVal=Math.max(...dailyDetails.map((x,i)=>x.total+dailyKinomi[i]),1);
-  const barH=76;
-  document.getElementById('dayBars').innerHTML=DAYS.map((d,i)=>{
-    const k=dailyKinomi[i],r=dailyDetails[i].total;
-    return `<div class="day-bar-col">
-      <div class="day-bar-val">${((k+r)/1000).toFixed(1)}k</div>
-      <div class="day-bar-stack">
-        <div class="day-bar-k" style="height:${Math.round(k/maxVal*barH)}px;"></div>
-        <div class="day-bar-s" style="height:${Math.round(r/maxVal*barH)}px;"></div>
-      </div>
-      <div class="day-bar-label">${d}</div></div>`;
-  }).join('');
-}
-
-// ===== ⑥ A/B比較 =====
-function renderCompare(){
-  const dA=calcSummaryData('A');
-  const dB=calcSummaryData('B');
-
-  function diffBadge(valA,valB,isA){
-    const val=isA?valA:valB;
-    const other=isA?valB:valA;
-    const diff=val-other;
-    if(Math.abs(diff)<1) return `<span class="diff-badge same">同等</span>`;
-    if(diff>0)  return `<span class="diff-badge better">+${diff.toLocaleString()}</span>`;
-    return `<span class="diff-badge worse">${diff.toLocaleString()}</span>`;
-  }
-
-  document.getElementById('compareContent').innerHTML=`
-    <div class="compare-summary">
-      ${['A','B'].map(ab=>{
-        const d=ab==='A'?dA:dB;
-        const other=ab==='A'?dB:dA;
-        const isBetter=d.grandTotal>=other.grandTotal;
-        return `
-          <div class="compare-panel ${ab.toLowerCase()}">
-            <div class="compare-panel-title">
-              <span class="ab-label ${ab.toLowerCase()}">パターン${ab}</span>
-              ${isBetter&&d.grandTotal!==other.grandTotal?'<span class="diff-badge better">👑 優勢</span>':''}
-            </div>
-            <div class="compare-kpi">
-              <div class="compare-kpi-label">週間合計エナジー</div>
-              <div style="display:flex;align-items:baseline;gap:.5rem;">
-                <div class="compare-kpi-val" style="color:var(--col${ab});">${d.grandTotal.toLocaleString()}</div>
-                ${diffBadge(dA.grandTotal,dB.grandTotal,ab==='A')}
-              </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem;">
-              <div class="compare-kpi">
-                <div class="compare-kpi-label">きのみ（週）</div>
-                <div class="compare-kpi-val" style="color:var(--green);font-size:1rem;">${d.totalKinomi.toLocaleString()}</div>
-              </div>
-              <div class="compare-kpi">
-                <div class="compare-kpi-label">料理（期待値）</div>
-                <div class="compare-kpi-val" style="color:var(--orange);font-size:1rem;">${d.weekRecipeTotal.toLocaleString()}</div>
-              </div>
-            </div>
-            <div style="margin-top:.3rem;font-size:.63rem;color:var(--text-dim);">
-              料理：最低 ${d.weekNormal.toLocaleString()} 〜 最高 ${d.weekMax.toLocaleString()}
-            </div>
-            <div style="margin-top:.8rem;font-size:.66rem;font-weight:800;color:var(--text-dim);margin-bottom:.3rem;">ポケモン別きのみ</div>
-            <table style="width:100%;font-size:.7rem;border-collapse:collapse;">
-              ${d.pokemonWeekly.map(p=>`<tr>
-                <td style="padding:2px 0;border-bottom:1px solid var(--bg2);">${p.name}${p.hasSkill?' 🍳':''}</td>
-                <td style="text-align:right;font-weight:700;color:var(--green);padding:2px 0;border-bottom:1px solid var(--bg2);">${p.weekKinomi.toLocaleString()}</td>
-              </tr>`).join('')}
-            </table>
-          </div>`;
-      }).join('')}
-    </div>`;
-}
-
-// ===== 初期化 =====
-renderPokemonGrid();
-renderStock();
-renderMealTabs();
-renderMealGrid();
-updateAbNotes();
-
-// ===== JSON エクスポート/インポート =====
 function exportData(){
-  const data = {
-    version: 1,
-    savedAt: new Date().toISOString(),
-    pokemonList,
-    stockData,
-    recipeSettings,
-    globalFB,
-    abData,
-    currentMealGenre,
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  const date = new Date().toLocaleDateString('ja-JP',{year:'2-digit',month:'2-digit',day:'2-digit'}).replace(/\//g,'');
-  a.href     = url;
-  a.download = `pokesleep_${date}.json`;
+  syncAll();
+  const data={version:1,exported:new Date().toISOString(),pokemons:pokemons.map(p=>({
+    name:p.name,emoji:p.emoji,curLv:p.curLv,goalLv:p.goalLv,remExp:p.remExp,
+    nature:p.nature,expType:p.expType,segments:p.segments,checked:p.checked,result:p.result
+  }))};
+  const json=JSON.stringify(data,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='pokesleep_backup_'+new Date().toISOString().slice(0,10)+'.json';
   a.click();
   URL.revokeObjectURL(url);
 }
 
-function importData(event){
-  const file = event.target.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if(!data.version || !data.pokemonList) throw new Error('形式が不正です');
-
-      // 読み込み確認
-      if(!confirm(`「${file.name}」を読み込みます。\n現在の入力内容は上書きされます。よろしいですか？`)) return;
-
-      // データ復元
-      pokemonList         = data.pokemonList;
-      nextPokemonId       = Math.max(...pokemonList.map(p=>p.id)) + 1;
-      Object.assign(stockData,    data.stockData    || {});
-      Object.assign(recipeSettings, data.recipeSettings || {});
-      globalFB            = data.globalFB ?? 0;
-      document.getElementById('fbInput').value = globalFB;
-
-      // abData（シフト・料理予定）
-      if(data.abData){
-        ['A','B'].forEach(ab=>{
-          if(data.abData[ab]){
-            abData[ab].shift = data.abData[ab].shift;
-            abData[ab].meal  = data.abData[ab].meal;
-          }
-        });
-      }
-
-      if(data.currentMealGenre){
-        currentMealGenre = data.currentMealGenre;
-        document.querySelectorAll('.genre-btn').forEach(b=>{
-          b.classList.toggle('active', b.dataset.genre===currentMealGenre);
-        });
-      }
-
-      // 再描画
-      renderPokemonGrid();
-      renderStock();
-      renderShiftTable();
-      renderMealTabs();
-      renderMealGrid();
-      renderRecipeSettings();
-
-      alert(`✅ 読み込み完了！\n保存日時: ${new Date(data.savedAt).toLocaleString('ja-JP')}`);
-    } catch(err) {
-      alert(`❌ 読み込み失敗: ${err.message}`);
-    }
-    // input をリセット（同じファイルを再選択できるよう）
-    event.target.value = '';
-  };
-  reader.readAsText(file);
+function openImport(){
+  document.getElementById('import-text').value='';
+  document.getElementById('import-modal').style.display='flex';
 }
+function closeImport(){document.getElementById('import-modal').style.display='none';}
+function closeImportOnOverlay(e){if(e.target===document.getElementById('import-modal'))closeImport();}
+
+function doImport(){
+  const raw=document.getElementById('import-text').value.trim();
+  let data;
+  try{data=JSON.parse(raw);}catch(e){alert('JSONの形式が正しくありません。');return;}
+  if(!data.pokemons||!Array.isArray(data.pokemons)){alert('データの形式が正しくありません。');return;}
+  pokemons=data.pokemons.map((p,i)=>({
+    id:i+1,
+    name:p.name||'',
+    emoji:p.emoji||EMOJIS[i%EMOJIS.length],
+    curLv:p.curLv||1,
+    goalLv:p.goalLv||50,
+    remExp:p.remExp||'',
+    nature:p.nature||'1',
+    expType:p.expType||'1',
+    segments:p.segments||[],
+    checked:p.checked!==false,
+    open:false,
+    result:p.result||null
+  }));
+  nextId=pokemons.length+1;
+  closeImport();
+  renderAll();
+}
+
+/* ─── helpers ─── */
+function levelOpts(min,max,sel){
+  let s='';
+  for(let i=min;i<=max;i++)s+=`<option value="${i}"${i===sel?' selected':''}>Lv.${i}</option>`;
+  return s;
+}
+function boostLabel(b){return b===4?'ミニ×4':b===5?'ブースト×5':'なし';}
+
+/* ─── render card ─── */
+function renderCard(p){
+  const hasResult=p.result!==null;
+  const candyStr=hasResult?p.result.totalC.toLocaleString():'—';
+  const yumeStr=hasResult?p.result.totalY.toLocaleString():'—';
+  const displayName=p.name||'なまえ未入力';
+  const avatarBg=hasResult?'#d1fae5':'#e1f5ee';
+  const candyBadgeCls=hasResult?'badge-candy':'badge-nc';
+  const yumeBadgeCls=hasResult?'badge-yume':'badge-nc';
+
+  let segHtml='';
+  p.segments.forEach((seg,idx)=>{
+    segHtml+=`<div class="seg-row">
+      <select class="seg-from-${p.id}" style="height:30px;font-size:12px;flex:1;min-width:70px">${levelOpts(p.curLv,p.goalLv-1,seg.from)}</select>
+      <span style="font-size:12px;color:#9ca3af">→</span>
+      <select class="seg-to-${p.id}" style="height:30px;font-size:12px;flex:1;min-width:70px">${levelOpts(p.curLv+1,p.goalLv,seg.to)}</select>
+      <select class="seg-boost-${p.id}" style="height:30px;font-size:12px;flex:2;min-width:130px">
+        <option value="4"${seg.boost===4?' selected':''}>ミニアメブースト (×4)</option>
+        <option value="5"${seg.boost===5?' selected':''}>アメブースト (×5)</option>
+      </select>
+      <button class="btn-del-seg" onclick="deleteSegment(${p.id},${idx})" aria-label="削除">×</button>
+    </div>`;
+  });
+
+  let resultHtml='';
+  if(hasResult){
+    resultHtml=`<div class="result-box">
+      <div class="result-big">
+        <div class="result-metric"><div class="result-metric-label">🍬 必要なアメ</div><div class="result-metric-val rm-candy">${p.result.totalC.toLocaleString()}<span style="font-size:12px;margin-left:2px">個</span></div></div>
+        <div class="result-metric"><div class="result-metric-label">✨ ゆめのかけら</div><div class="result-metric-val rm-yume">${p.result.totalY.toLocaleString()}<span style="font-size:12px;margin-left:2px">個</span></div></div>
+      </div>`;
+    if(p.result.breakdown.length>1){
+      p.result.breakdown.forEach(b=>{
+        const bl=b.boost>1?`<span class="badge-boost">${boostLabel(b.boost)}</span>`:`<span class="badge-none-sm">ブーストなし</span>`;
+        resultHtml+=`<div class="result-row"><span>Lv.${b.from}→${b.to} ${bl}</span><span>アメ <b>${b.c.toLocaleString()}</b> / ゆめ <b>${b.y.toLocaleString()}</b></span></div>`;
+      });
+    }
+    resultHtml+='</div>';
+  }
+
+  const emojiPickerHtml=EMOJIS.map(e=>`<button class="emoji-btn${p.emoji===e?' sel':''}" onclick="setEmoji(${p.id},'${e}')">${e}</button>`).join('');
+
+  return `<div class="pcard${p.checked?' checked':''}" id="pcard-${p.id}">
+    <div class="pcard-header">
+      <div class="chk-wrap" onclick="event.stopPropagation()">
+        <input type="checkbox" ${p.checked?'checked':''} onchange="toggleCheck(${p.id})" title="集計に含める">
+      </div>
+      <div class="pcard-header-left" onclick="toggleCard(${p.id})">
+        <div class="pcard-avatar" style="background:${avatarBg}">${p.emoji}</div>
+        <div style="flex:1;min-width:0">
+          <div class="pcard-name">${displayName}</div>
+          <div class="pcard-meta">Lv.${p.curLv} → Lv.${p.goalLv}</div>
+        </div>
+        <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+          <span class="badge ${candyBadgeCls}">🍬 ${candyStr}</span>
+          <span class="badge ${yumeBadgeCls}">✨ ${yumeStr}</span>
+        </div>
+      </div>
+      <span class="chevron${p.open?' open':''}" onclick="toggleCard(${p.id})">▼</span>
+    </div>
+    <div class="pcard-body${p.open?' open':''}">
+      <div style="margin-bottom:10px">
+        <div class="form-label" style="margin-bottom:4px">アイコン</div>
+        <div class="emoji-picker">${emojiPickerHtml}</div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field" style="grid-column:1/-1">
+          <label class="form-label" for="name-${p.id}">ポケモン名</label>
+          <input type="text" id="name-${p.id}" value="${p.name}" placeholder="例：ピカチュウ">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="cur-${p.id}">現在のレベル</label>
+          <select id="cur-${p.id}">${levelOpts(1,64,p.curLv)}</select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="goal-${p.id}">目標レベル</label>
+          <select id="goal-${p.id}">${levelOpts(2,65,p.goalLv)}</select>
+        </div>
+        <div class="form-field" style="grid-column:1/-1">
+          <label class="form-label" for="rem-${p.id}">次のレベルまでの経験値 <span style="font-weight:400;color:#9ca3af">(未入力=最大値)</span></label>
+          <input type="number" id="rem-${p.id}" value="${p.remExp}" placeholder="未入力で最大" min="0" style="max-width:140px">
+        </div>
+        <div class="form-field" style="grid-column:1/-1">
+          <div class="form-label">性格補正</div>
+          <div class="radio-group">
+            <label><input type="radio" name="nat-${p.id}" value="1.1"${p.nature==='1.1'?' checked':''}> 経験値↑↑</label>
+            <label><input type="radio" name="nat-${p.id}" value="1"${p.nature==='1'?' checked':''}> 通常</label>
+            <label><input type="radio" name="nat-${p.id}" value="0.9"${p.nature==='0.9'?' checked':''}> 経験値↓↓</label>
+          </div>
+        </div>
+        <div class="form-field" style="grid-column:1/-1">
+          <div class="form-label">ポケモン種別補正</div>
+          <div class="radio-group">
+            <label><input type="radio" name="et-${p.id}" value="1"${p.expType==='1'?' checked':''}> 通常</label>
+            <label><input type="radio" name="et-${p.id}" value="1.5"${p.expType==='1.5'?' checked':''}> ×1.5倍</label>
+            <label><input type="radio" name="et-${p.id}" value="1.8"${p.expType==='1.8'?' checked':''}> ×1.8倍</label>
+            <label><input type="radio" name="et-${p.id}" value="2.2"${p.expType==='2.2'?' checked':''}> ×2.2倍</label>
+          </div>
+        </div>
+      </div>
+      <div class="seg-section-title">🚀 ブースト区間設定</div>
+      <div>${segHtml||'<p style="font-size:12px;color:#9ca3af;padding:4px 0">区間なし（全区間ブーストなし）</p>'}</div>
+      <button class="btn-add-seg" onclick="addSegment(${p.id})">＋ 区間を追加</button>
+      ${resultHtml}
+      <div class="pcard-actions">
+        <button class="btn-calc" onclick="calcPokemon(${p.id})">計算する</button>
+        <button class="btn-del-poke" onclick="deletePokemon(${p.id})">削除</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ─── render total ─── */
+function renderTotal(){
+  const all=pokemons.filter(p=>p.result!==null);
+  const checked=all.filter(p=>p.checked);
+  if(all.length===0)return '';
+
+  const totalC=checked.reduce((s,p)=>s+p.result.totalC,0);
+  const totalY=checked.reduce((s,p)=>s+p.result.totalY,0);
+
+  const uncheckedCalc=all.filter(p=>!p.checked);
+  let noticeHtml='';
+  if(uncheckedCalc.length>0){
+    noticeHtml=`<div class="total-notice">⬛ チェックなし（集計外）：${uncheckedCalc.map(p=>`${p.emoji} ${p.name||'未入力'}`).join('、')}</div>`;
+  }
+
+  if(checked.length===0){
+    return `<div class="total-card">
+      <div class="total-title">🌟 集計</div>
+      <p style="font-size:13px;color:#6b7280">チェックされたポケモンがいません。<br>カードのチェックボックスで集計対象を選んでください。</p>
+      ${noticeHtml}
+    </div>`;
+  }
+
+  const rows=checked.map(p=>`<div class="total-row"><span>${p.emoji} ${p.name||'なまえ未入力'}</span><span>🍬 ${p.result.totalC.toLocaleString()} / ✨ ${p.result.totalY.toLocaleString()}</span></div>`).join('');
+
+  return `<div class="total-card">
+    <div class="total-title">🌟 集計（${checked.length}体）</div>
+    <div class="total-grid">
+      <div class="total-metric"><div class="total-metric-label">🍬 アメ合計</div><div class="total-metric-val tv-candy">${totalC.toLocaleString()}<span style="font-size:13px;margin-left:3px">個</span></div></div>
+      <div class="total-metric"><div class="total-metric-label">✨ ゆめのかけら合計</div><div class="total-metric-val tv-yume">${totalY.toLocaleString()}<span style="font-size:13px;margin-left:3px">個</span></div></div>
+    </div>
+    <div class="total-rows">${rows}</div>
+    ${noticeHtml}
+  </div>`;
+}
+
+/* ─── renderAll ─── */
+function renderAll(){
+  const list=document.getElementById('poke-list');
+  const totalArea=document.getElementById('total-area');
+  if(pokemons.length===0){
+    list.innerHTML=`<div class="empty-state"><div class="empty-icon">🌙</div><div>「追加」ボタンからポケモンを登録して<br>アメ・ゆめのかけらを計算しましょう</div></div>`;
+  } else {
+    list.innerHTML=pokemons.map(renderCard).join('');
+  }
+  const calcedCount=pokemons.filter(p=>p.result!==null).length;
+  totalArea.innerHTML=calcedCount>0?renderTotal():'';
+}
+
+renderAll();
 </script>
 </body>
 </html>
